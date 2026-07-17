@@ -1,0 +1,38 @@
+{
+  "texpace": "1.0",
+  "profile": "3d",
+  "frame": { "handedness": "right", "up": "+Z", "forward": "+Y", "origin": "site_datum" },
+  "units": { "length": "m", "angle": "rad" },
+  "timebase": "seconds",
+  "tolerance": { "length": "5mm", "angle": "6deg", "time": "1ms" },
+
+  "entities": [
+    { "name": "desk",  "type": "desk",  "shape": { "kind": "box", "extent": [1.6, 0.8, 0.75] }, "position": [0.0, 0.0, 0.375] },
+    { "name": "chair", "type": "chair", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.9] },  "position": [0.0, 0.9, 0.45], "orientation": [0.0, 0.0, 0.0, 1.0] },
+    { "name": "lamp",  "type": "lamp",  "shape": { "kind": "box", "extent": [0.2, 0.2, 0.4] },  "position": [0.6, 0.0, 0.95] },
+    { "name": "ball",  "type": "ball",  "shape": { "kind": "sphere", "radius": 0.1 },           "position": [-2.0, 0.0, 0.1] }
+  ],
+
+  "viewpoints": [
+    { "name": "door", "position": [0.0, 6.0, 1.6], "look_at": "desk" }
+  ],
+
+  "claims": [
+    { "pred": "TOP", "a": "lamp", "b": "desk", "rcc": ["EC"], "text": "the lamp rests on the desk" },
+    { "pred": "DIR", "fig": "lamp", "gnd": "desk", "term": "above", "text": "the lamp is above the desk" },
+    { "pred": "DIR", "fig": "chair", "gnd": "desk", "term": "front", "anchor": { "kind": "locale" }, "text": "the chair is in front of the desk" },
+    { "pred": "FACES", "a": "chair", "b": "desk", "text": "the chair faces the desk" },
+    { "pred": "DIST", "fig": "ball", "gnd": "desk", "op": "<", "q": { "value": 1.5, "unit": "m" }, "text": "the ball is within 1.5m of the desk" },
+    { "pred": "DIR", "fig": "ball", "gnd": "desk", "term": "right", "anchor": { "kind": "group", "viewpoint": "door" }, "text": "the ball is right of the desk seen from the door" },
+    {
+      "quant": "none",
+      "over": { "pairs": { "type": "thing" } },
+      "pred": { "pred": "TOP", "rcc": ["PO", "EQ", "TPP", "TPPi", "NTPP", "NTPPi"] },
+      "text": "no two objects overlap"
+    },
+    { "pred": "COUNT", "set": { "type": "furniture" }, "op": "==", "n": 2, "text": "there are exactly 2 pieces of furniture" },
+
+    { "pred": "DIST", "fig": "ball", "gnd": "desk", "op": "<", "q": { "value": 3, "unit": "reldepth" }, "text": "TYPE ERROR ON PURPOSE: ordinal depth in a metric predicate (C2)" },
+    { "pred": "DIR", "fig": "chair", "gnd": "ball", "term": "left", "anchor": { "kind": "locale" }, "text": "ARITY GATE ON PURPOSE: a ball has no front (SPEC §1.2)" }
+  ]
+}
