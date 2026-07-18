@@ -3,3 +3,6 @@ __pycache__/
 .pytest_cache/
 .venv/
 *.egg-info/
+
+# stubgen bug: it mirrors the package into a nested dir
+checker/checker/
