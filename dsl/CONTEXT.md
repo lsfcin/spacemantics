@@ -41,8 +41,8 @@ Grounding: `academy/papers/spacemantics/outputs/texpace-foundations.md` (researc
 | [`CHECKABILITY.md`](CHECKABILITY.md) | — | — | texpace — Checkability Filter (enforced) |
 | [`CONFLICTS.md`](CONFLICTS.md) | — | — | texpace — Conventions Reconciliation |
 | [`CONFORMANCE.md`](CONFORMANCE.md) | — | — | texpace — Adapter Conformance |
-| [`EXAMPLES.md`](EXAMPLES.md) | — | — | texpace — Worked Examples |
-| [`GRAMMAR-JSON.md`](GRAMMAR-JSON.md) | — | — | texpace — JSON Interchange Surface |
+| [`EXAMPLES.md`](EXAMPLES.md) | — | — | texpace — Worked Examples (v2 prose) |
+| [`GRAMMAR-JSON.md`](GRAMMAR-JSON.md) | — | — | texpace — JSON Interchange Surface (v2) |
 | [`INVENTORY-ADVISORY.md`](INVENTORY-ADVISORY.md) | — | — | texpace — Concept Inventory: advisory and out-of-scope |
 | [`INVENTORY.md`](INVENTORY.md) | — | — | texpace — Concept Inventory |
 | [`LEXICON.md`](LEXICON.md) | — | — | texpace — Controlled-English Lexicon (v2) |

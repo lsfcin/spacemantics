@@ -1,97 +1,110 @@
-# texpace — JSON Interchange Surface
-> Schema-shaped spec + round-trip table for the JSON surface, bijective with GRAMMAR-PROSE.ebnf over the same AST.
+# texpace — JSON Interchange Surface (v2)
+> The JSON AST the checker actually consumes, bijective with GRAMMAR-PROSE.ebnf. This is the real schema — `examples/office.json` is a live instance.
 
-Derived mechanically from the JSON fragments already given at the end of `EXAMPLES.md` ("The same
-document, JSON surface") plus the AST described in `SPEC.md` §1 (kernel), §1.2 (anchors/arity gate),
-§1.7 (time), §2 (modules), §3 (physics). Field names (`kind`, `rel`, `figure`, `ground`, `anchor`)
-continue the naming EXAMPLES.md already established — nothing here is a fresh vocabulary.
+This is **not** an invented interchange format: it is exactly what
+[`../checker/loader.py`](../checker/loader.py) parses and
+[`../checker/evaluate.py`](../checker/evaluate.py) scores. Prose and JSON are two surfaces over one AST;
+the checker sees only the AST (SPEC §"Surfaces"). Run it: `python -m checker ../examples/office.json`.
 
-## 1. The statement envelope
+## 1. Document
+
+Nothing is implicit — a missing header field does not parse (SPEC §0, `loader._required`).
 
 ```json
 {
-  "kind": "assert | constrain",
-  "quantifier": "none | every | count",
-  "over": { "var": "<ident>?", "set": "<ident>", "qualifier": { "rel": "within|in", "ground": "<ident>" } },
-  "count": "<integer>",
-  "rel": "clear_of | touches | rests_on | sits_on | overlaps | inside | within | contains | coincides |
-          dir | dist_within | dist_at_least | dist_eq | near | far |
-          faces | points_at | aligned | flush | parallel | perpendicular |
-          moves_to | moves_toward | moves_away | passes_behind | passes_front | passes_over |
-          passes_through | enters | leaves | comes_to_rest",
-  "figure": "<ident>",
-  "ground": "<ident>",
-  "anchor": "world | locale | { \"group\": { \"viewpoint\": \"<ident>\", \"transform\": \"reflected|rotated|translated\" } }",
-  "axis": "vertical | north | south | east | west | left | right | front | behind",
-  "quantity": { "value": "<number>", "unit": "m|mm|px|cells|s|ms|deg" },
-  "rcc8": "DC | EC | PO | TPP | TPPi | NTPP | NTPPi | EQ",
-  "temporal": {
-    "at": "<quantity>", "over": ["<quantity>", "<quantity>"],
-    "allen": "before | after | during | until", "lhs": "<statement>", "rhs": "<statement>",
-    "seq": ["<statement>", "..."],
-    "hold": { "pred": "<statement>", "duration": "<quantity>" },
-    "repeat": { "action": "<ident>", "times": "<integer>" }
-  },
-  "keyframe": { "entity": "<ident>", "t": "<quantity>", "position": ["<number|quantity>", "x3"] },
-  "array": {
-    "module": "<ident>", "count": "<integer>", "axis": "<signed-axis>", "spacing": "<quantity|ident>",
-    "as": "<ident>", "overrides": [{ "index": "<integer>", "type": "<ident>" }]
-  },
-  "outcome": "<boolean>",
-  "physics": { "advisory": true, "engine": "<ident>", "gravity": "<number>" }
+  "texpace": "1.0",
+  "profile": "2d | 2.5d | 3d | 4d",
+  "frame":  { "handedness": "right", "up": "+Z", "forward": "+Y", "origin": "<name>" },
+  "units":  { "length": "m", "angle": "rad", "dpi": 96, "cell_size_m": 1.5, "parent_extent_m": 1.0 },
+  "timebase": "seconds | steps | months | frames",
+  "tolerance": { "length": "5mm", "angle": "0.5deg", "time": "1ms" },
+  "types":      [ { "name": "lectern", "parent": "furniture" } ],
+  "entities":   [ /* §2 */ ],
+  "viewpoints": [ /* §3 */ ],
+  "events":     { "touch_shelf": [1.0, 1.02] },
+  "claims":     [ /* §4 */ ]
 }
 ```
 
-Every field is optional except `kind`; which fields co-occur is determined by `rel`/`quantifier`/
-`temporal` the same way the prose grammar's non-terminals gate which tail follows which head (e.g.
-`rel: "dir"` requires `axis` and `anchor`; `quantifier: "count"` requires `count` and `over`, not `rel`).
+- **`frame` must be canonical** — right-handed, `+Z` up, `+Y` forward (C1). A non-canonical frame is
+  rejected at the door; the *adapter* converts, the checker never does (`loader._require_frame`).
+- **`tolerance` is mandatory.** `units.dpi` / `cell_size_m` / `parent_extent_m` are only required when a
+  device / grid / normalized unit is actually used (C2).
+- **`types`** extends the base ontology of [TYPES.md](TYPES.md); `has_front` is inherited unless overridden.
 
-## 2. Field reference
+## 2. Entity
 
-| Field | Closed values | Prose-side origin |
+```json
+{
+  "name": "chair", "type": "chair",
+  "shape": { "kind": "box", "extent": [0.5, 0.5, 0.9] },   // or {"kind":"sphere","radius":0.1}, {"kind":"point"}
+  "position": [0.0, 0.9, 0.45],
+  "orientation": [1.0, 0.0, 0.0, 0.0],                     // unit quaternion (w,x,y,z); never Euler (C4)
+  "keyframes": [ { "t": 0.0, "position": [-2,0,0.1], "orientation": [1,0,0,0] } ],
+  "free": ["position.z"]                                   // declared-free DOF: reported, never scored
+}
+```
+
+`orientation` defaults to identity; `keyframes` (when present) override the static pose and are
+interpolated at the claim's instant. A prose `add a chair of size ...` desugars to one entity object; the
+prose verb tail (`in front of the desk`) desugars to a **claim**, not into the entity.
+
+## 3. Viewpoint
+
+```json
+{ "name": "ne_cam", "position": [8, 8, 6], "look_at": "plaza" }
+```
+
+Binds the **group** anchor. Prose `view from (8,8,6) looking at the plaza, isometric, called ne_cam.`
+
+## 4. Claims — the scored AST
+
+One object per claim. `"mode"` is `"assert"` (a fact, scored) or `"constrain"` (a goal, recorded);
+`"at"` names an instant (seconds); `"text"` is the rendered prose the report echoes. Every claim carries a
+`"pred"` **or** a `"quant"`/`"pred"` pair.
+
+| Predicate object | Prose (LEXICON) |
+|---|---|
+| `{"pred":"TOP","a","b","rcc":["EC"]}` | `A rests on B` / `A is inside B` (rcc = the accepted RCC-8 codes) |
+| `{"pred":"DIR","fig","gnd","term":"above","anchor":{"kind":"world"}}` | `A is above B` (world; compass too) |
+| `{"pred":"DIR","fig","gnd","term":"front","anchor":{"kind":"locale"}}` | `A is in front of B` (B has a front) |
+| `{"pred":"DIR","fig","gnd","term":"left","anchor":{"kind":"group","viewpoint":"ne_cam"}}` | `A is left of B seen from ne_cam` |
+| `{"pred":"DIST","fig","gnd","op":"<","q":{"value":1.5,"unit":"m"}}` | `A is within 1.5m of B` |
+| `{"pred":"FACES","a","b"}` | `A faces B` |
+| `{"pred":"PARALLEL","a","b"}` / `{"pred":"PERPENDICULAR","a","b"}` | `A is parallel/perpendicular to B` |
+| `{"pred":"ALIGNED","a","b","axis":"x"}` | `A is aligned with B` |
+| `{"pred":"COUNT","set":{"type":"furniture"},"op":"==","n":2}` | `there are exactly 2 ...` (coverage) |
+| `{"pred":"ALLEN","a","b","rel":"before|meets"}` | `A before B` — `a`,`b` are `events` keys |
+| `{"pred":"HOLD","interval":[0,2],"claim":{...}}` | `hold <claim> for 2s` |
+| `{"quant":"none","over":{"pairs":{"type":"thing"}},"pred":{"pred":"TOP","rcc":["PO","EQ","TPP","TPPi","NTPP","NTPPi"]}}` | `no two objects overlap` |
+| `{"quant":"every","over":{"set":{"type":"furniture"},"as":"a"},"pred":{"pred":"TOP","b":"ball","rcc":["DC"]}}` | `every ... is clear of the ball` |
+
+**Selectors** (`set`, `over.pairs`, `over.set`): `{"type":"<t>"}` matches the type and its subtypes;
+`{"names":[...]}` matches an explicit list. `over.pairs` binds unordered pairs (the `no two` idiom);
+`over.set` binds one variable named by `over.as`.
+
+## 5. Bijection — the six examples' claims
+
+Each scored prose line from [EXAMPLES.md](EXAMPLES.md) and the AST it desugars to.
+
+| # | Prose (EXAMPLES.md) | JSON AST |
 |---|---|---|
-| `kind` | `assert`, `constrain` | LEXICON §9 (bare statement vs `must`) |
-| `rel` | the ~25 relation names above | LEXICON §2-6 verb/copula phrasings |
-| `anchor` | `world`, `locale`, `group{viewpoint,transform}` | LEXICON §3 frame rule; SPEC §1.2 arity gate |
-| `axis` | `vertical`, compass 4, `left/right/front/behind` | LEXICON §3 `dir_tail` |
-| `quantity.unit` | `m mm px cells s ms deg` | LEXICON quantities throughout |
-| `rcc8` | RCC-8 eight-set | LEXICON §2 table |
-| `quantifier` | `none`, `every`, `count` | LEXICON §8 |
-| `temporal.allen` | `before after during until` | LEXICON §7 |
-| `outcome` | boolean flag on a statement | SPEC §3 (physics observables only) |
+| 1 | `the title is within the card.` | `{"pred":"TOP","a":"title","b":"card","rcc":["TPP","NTPP"]}` |
+| 1 | `the title is above the button.` | `{"pred":"DIR","fig":"title","gnd":"button","term":"above","anchor":{"kind":"world"}}` |
+| 1 | `no two objects overlap.` | `{"quant":"none","over":{"pairs":{"type":"thing"}},"pred":{"pred":"TOP","rcc":["PO","EQ","TPP","TPPi","NTPP","NTPPi"]}}` |
+| 2 | `the chair faces the desk.` | `{"pred":"FACES","a":"chair","b":"desk"}` |
+| 2 | `the desk is left of the ball.` | `{"pred":"DIR","fig":"desk","gnd":"ball","term":"left","anchor":{"kind":"locale"}}` → **ERROR** (ball has no front) |
+| 3 | `the token is left of the crate seen from ne_cam.` | `{"pred":"DIR","fig":"token","gnd":"crate","term":"left","anchor":{"kind":"group","viewpoint":"ne_cam"}}` |
+| 4 | `every house in the houses rests on the terrain.` | `{"quant":"every","over":{"set":{"type":"house"},"as":"a"},"pred":{"pred":"TOP","b":"terrain","rcc":["EC"]}}` |
+| 4 | `there are exactly 7 houses.` | `{"pred":"COUNT","set":{"type":"house"},"op":"==","n":7}` |
+| 5 | `hold the ball is clear of the box for 0.3s.` | `{"pred":"HOLD","interval":[0,0.3],"claim":{"pred":"TOP","a":"ball","b":"box","rcc":["DC"]}}` |
+| 6 | `the ball touches the box before the ball touches the shelf.` | `{"pred":"ALLEN","a":"touch_box","b":"touch_shelf","rel":"before|meets"}` |
 
-## 3. Round-trip table
+The prose action `repeat the casa 7 times ...` is a **module/loader** concern, not a claim — it expands the
+scene before any claim is scored (and is a demoted concept today, see [CHECKABILITY.md](CHECKABILITY.md)).
 
-The bijection contract: each prose line from `EXAMPLES.md` and the JSON it desugars to.
+## 6. The checker consumes neither surface
 
-| # | Prose (verbatim from EXAMPLES.md) | JSON AST |
-|---|---|---|
-| 1 | `title is within card` | `{"kind":"assert","rel":"within","figure":"title","ground":"card","anchor":"world"}` |
-| 2 | `title is above button` | `{"kind":"assert","rel":"dir","axis":"vertical","figure":"title","ground":"button","anchor":"world"}` |
-| 3 | `button is at least 16px from card` | `{"kind":"assert","rel":"dist_at_least","figure":"button","ground":"card","quantity":{"value":16,"unit":"px"}}` |
-| 4 | `no two elements overlap` | `{"kind":"assert","quantifier":"none","rel":"overlaps","over":{"a":"elements","b":"elements"}}` |
-| 5 | `there are exactly 3 elements within card` | `{"kind":"assert","quantifier":"count","count":3,"over":{"set":"elements","qualifier":{"rel":"within","ground":"card"}}}` |
-| 6 | `chair is in front of desk` | `{"kind":"assert","rel":"dir","axis":"front","figure":"chair","ground":"desk","anchor":"locale"}` |
-| 7 | `chair faces desk` | `{"kind":"assert","rel":"faces","figure":"chair","ground":"desk"}` |
-| 8 | `lamp rests on desk` | `{"kind":"assert","rel":"rests_on","figure":"lamp","ground":"desk","rcc8":"EC"}` |
-| 9 | `token is left of crate seen from ne_cam` | `{"kind":"assert","rel":"dir","axis":"left","figure":"token","ground":"crate","anchor":{"group":{"viewpoint":"ne_cam","transform":"reflected"}}}` |
-| 10 | `every house in houses rests on terrain` | `{"kind":"assert","quantifier":"every","over":{"var":"house","set":"houses"},"rel":"rests_on","ground":"terrain"}` |
-| 11 | `ball passes behind box then is left of box seen from cam` | `{"kind":"assert","temporal":{"seq":[{"rel":"passes_behind","figure":"ball","ground":"box"},{"rel":"dir","axis":"left","figure":"ball","ground":"box","anchor":{"group":{"viewpoint":"cam","transform":"reflected"}}}]}}` |
-| 12 | `hold ball is clear of box for 0.3s` | `{"kind":"assert","temporal":{"hold":{"pred":{"rel":"clear_of","figure":"ball","ground":"box"},"duration":{"value":0.3,"unit":"s"}}}}` |
-| 13 | `ball comes to rest on shelf` | `{"kind":"assert","rel":"comes_to_rest","figure":"ball","ground":"shelf","rcc8":"EC","outcome":true}` |
-| 14 | `ball touches box before ball touches shelf` | `{"kind":"assert","temporal":{"allen":"before","lhs":{"rel":"touches","figure":"ball","ground":"box"},"rhs":{"rel":"touches","figure":"ball","ground":"shelf"}},"outcome":true}` |
-
-Rows 13-14 carry `"outcome": true` because they sit under `physics bullet, gravity -9.81` in example 6
-(SPEC §3): the simulation that produced them is advisory and unscored, but the resting position and
-the Allen ordering of contact events are observables the checker does verify.
-
-The spatial array (`repeat casa 7 times along +X spacing W as houses` + `houses[6] is a corner_unit`,
-example 4) desugars to a single `array` object rather than a `statement`:
-`{"array":{"module":"casa","count":7,"axis":"+X","spacing":"W","as":"houses","overrides":[{"index":6,"type":"corner_unit"}]}}`.
-
-## 4. The checker consumes neither surface
-
-The checker never parses prose or JSON directly — it evaluates the AST both surfaces desugar to
-(`SPEC.md` §1.3-1.7). Prose-vs-JSON is therefore a free experimental variable, not a scoring dimension:
-which surface a model is asked to emit is an ablation axis in the benchmark, testing the project's own
-claim that the capability lift comes from the checker, not the grammar surface.
+The checker evaluates the AST both surfaces desugar to. Prose-vs-JSON is therefore a free experimental
+variable, not a scoring dimension: which surface a model emits is an ablation axis in the benchmark (M2),
+testing the project's own claim that the lift comes from the checker, not the notation.

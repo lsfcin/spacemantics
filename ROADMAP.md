@@ -121,18 +121,22 @@ mechanical — regenerate the dependents from it:
       `in front of` (locale vs group anchor), so it is load-bearing, not cosmetic. User-extensible:
       *"a lectern is a kind of furniture with a front."*
 - [x] `dsl/TYPES.md` — type ontology + intrinsic-front flag; mirrored in `checker/types.py`.
-- [ ] `dsl/EXAMPLES.md` — rewrite all six examples in v2 prose (verbs + articles). **Blocked 2026-07-17**:
-      Sonnet weekly limit killed the W2b subagent mid-run. Still v1.
-- [ ] `dsl/GRAMMAR-PROSE.ebnf` — regenerate from LEXICON v2; must parse all six examples verbatim. Still v1.
-- [ ] `dsl/GRAMMAR-JSON.md` — regenerate the bijection table. Still v1.
+- [x] `dsl/EXAMPLES.md` — all six examples rewritten in v2 prose (verbs + articles + setup/action/claim).
+      Fixed a v1 semantic bug: `left of the desk` is legal (desk has a front); the error case needs a
+      frontless ground (`left of the ball`), matching `checker/test_direction.py`.
+- [x] `dsl/GRAMMAR-PROSE.ebnf` — regenerated from LEXICON v2; article rule is now syntactic (`move a ball`
+      is a grammar error); per-example parse trace + semantic side conditions documented.
+- [x] `dsl/GRAMMAR-JSON.md` — regenerated against the **real** checker AST (`loader.py`/`evaluate.py`),
+      not an invented schema; bijection table maps the six examples; `examples/office.json` is a live instance.
 - [x] `dsl/SPEC.md` — three-line-kinds model (setup / action / claim) + articles-as-identity-type added.
-- [ ] `sections/04_method.tex` — add the dual surface + the surface ablation.
+- [x] `sections/04_method.tex` — dual-surface paragraph + surface ablation (C1–C3 in both surfaces); paper
+      recompiles (10pp, 0 undefined citations).
 
 ### W3b — prose parser (deferred)
 The checker consumes the JSON AST directly and is fully exercised through it (39 tests + CLI). A
-controlled-English **parser** (prose → AST) is genuinely useful but depends on the v2 EXAMPLES/GRAMMAR
-above, which are blocked. Deferred until W2b's grammar files are regenerated; not on the M1 critical path
-because prose-vs-JSON is an M2 ablation axis, not a checker dependency.
+controlled-English **parser** (prose → AST) implementing GRAMMAR-PROSE.ebnf v2 is the remaining surface
+work. Deferred: not on the M1 critical path because prose-vs-JSON is an M2 ablation axis, not a checker
+dependency. The grammar it must implement is now written and example-traced.
 
 **The three design decisions (do not re-litigate):**
 1. **Verbs are sugar over `create` + `constrain`.** Actions = the program (ordered); claims = the spec

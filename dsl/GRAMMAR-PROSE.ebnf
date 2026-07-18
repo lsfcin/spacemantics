@@ -1,161 +1,176 @@
-(* texpace v1 PROSE surface grammar — controlled English. Derived mechanically from LEXICON.md (the
-   closed phrasing contract, source of truth) and checked line-by-line against all six documents in
-   EXAMPLES.md. Standard EBNF: "=" defines, ";" ends, "|" alternative, "{x}" zero-or-more, "[x]"
-   optional, "(x)" group, literals in quotes. Line comments "# ..." are lexically stripped like
-   whitespace and are not part of any production. See end-of-file for gaps and generalizations. *)
+(* texpace v2 PROSE surface grammar — controlled English with verbs, articles, and periods. Derived
+   mechanically from LEXICON.md v2 (the closed phrasing contract, source of truth) and checked
+   line-by-line against all six documents in EXAMPLES.md. Standard EBNF: "=" defines, ";" ends,
+   "|" alternative, "{x}" zero-or-more, "[x]" optional, "(x)" group, literals in quotes. Every line
+   ends with "." . Line comments "# ..." are lexically stripped like whitespace. See end-of-file for
+   the semantic side conditions EBNF cannot express, and the per-example parse trace. *)
 
-document        = scene_decl , { item } ;
-scene_decl      = "scene" , ident , "in" , profile ;
+document        = { line } ;
+line            = ( setup | action | claim ) , "." ;
+
+(* ============================================================================
+   THREE KINDS OF LINE (LEXICON §0). setup is unordered; action is an ordered
+   program; claim is the unordered spec — the only kind the checker scores.
+   ============================================================================ *)
+
+(* ---- SETUP — LEXICON §1 ---- *)
+setup           = profile_decl | units_decl | tolerance_decl | frame_decl
+                | view_decl | free_decl | physics_decl ;
+profile_decl    = "this" , "is" , "a" , profile , "scene" ;
 profile         = "2d" | "2.5d" | "3d" | "4d" ;
-
-item            = units_decl | frame_decl | tolerance_decl | let_decl | view_decl | dof_free_decl
-                | entity_decl | module_decl | repeat_spatial_decl | override_stmt | physics_decl
-                | statement ;
-
-(* ---- 1. declarations — LEXICON §1 ---- *)
-units_decl      = "units" , length_unit , [ "," , time_unit ] ;
-length_unit     = "meters" | "px" | "cells" ;
-time_unit       = "seconds" | "frames" , "@" , integer | "steps" | "months" ;
-frame_decl      = "frame" , "up" , signed_axis , handedness ;
+units_decl      = "use" , unit_word , [ "and" , unit_word ] , "as" , "units" ;
+unit_word       = "meters" | "seconds" | "pixels" | "cells" | "months" ;
+tolerance_decl  = "positions" , "are" , "accurate" , "to" , quantity
+                | "angles"    , "are" , "accurate" , "to" , quantity ;
+frame_decl      = "up" , "is" , signed_axis
+                | "the" , "frame" , "is" , handedness ;
 handedness      = "right-handed" | "left-handed" ;
-tolerance_decl  = "tolerance" , "length" , quantity , "," , "angle" , quantity ;
-let_decl        = "let" , NAME , "=" , quantity ;
-view_decl       = "view" , ident , "from" , "(" , number , "," , number , "," , number , ")" ,
-                   "looking" , "at" , ident , [ "," , "isometric" , "dimetric" ] ;
-dof_free_decl   = ident , "'s" , dof , "is" , "free" ;
-dof             = ident , { "." , ident } ;
-entity_decl     = "a" , ident , "is" , "a" , ident ,
-                   ( "sized" , dim , "x" , dim , [ "x" , dim ]
-                   | "with" , "radius" , quantity ) ;
-dim             = quantity | number | NAME ;   (* bare number inherits scene `units` — see note [6] *)
+view_decl       = "view" , "from" , point , "looking" , "at" , ref ,
+                  [ "," , projection ] , "," , "called" , NAME ;
+projection      = "isometric" | "orthographic" | "perspective" ;
+free_decl       = ref , "'s" , dof , "is" , "free" ;   (* underspecification, LEXICON §1 *)
+physics_decl    = "simulate" , "physics" , "with" , "gravity" , signed_number ;  (* advisory *)
 
-(* ---- 2-6. relations — the closed set, LEXICON §2-6 ---- *)
-predicate       = top_pred | dir_pred | dist_pred | align_pred | motion_pred ;
+(* ---- ACTIONS — the program, LEXICON §3 + §9. Verbs desugar to create + constrain. ---- *)
+action          = introduce | edit | define_decl | repeat_decl | override_stmt | keyframe_stmt ;
 
-top_pred        = "is" , top_is_tail , ident
-                | top_bare_verb , ident ;
-top_is_tail     = "clear" , "of" | "inside" | "within" ;
-top_bare_verb   = "touches" | "rests" , "on" | "sits" , "on" | "overlaps" | "contains"
-                | "coincides" , "with" ;
+(* Article rule made SYNTACTIC (LEXICON §2). Introduction uses `a`/`an` and only `add`/`create`.
+   Every other verb takes `the` + an existing reference. So `move a ball` cannot be derived at all —
+   the article, not a later pass, rejects it. *)
+introduce       = ( "add" | "create" ) , intro_np , { attribute } , [ spatial_tail ] ;
+intro_np        = article_a , type_name , [ "called" , NAME ] ;
+article_a       = "a" | "an" ;
+attribute       = "of" , "radius" , quantity
+                | "of" , "size" , dim , "x" , dim , [ "x" , dim ] ;
 
-dir_pred        = "is" , dir_tail , ident , [ seen_from ] ;
-dir_tail        = "above" | "below" | compass | "left" , "of" | "right" , "of"
-                | "in" , "front" , "of" | "behind" ;
-compass         = ( "north" | "south" | "east" | "west" ) , "of" ;
-seen_from       = "seen" , "from" , ident , [ "," , ( "mirrored" | "rotated" | "shifted" ) ] ;
+edit            = move_verb , ref , spatial_tail
+                | "rotate" , ref , quantity
+                | "point" , ref , "at" , ref
+                | ( "delete" | "remove" ) , ref
+                | ( "align" ) , ref , "with" , ref ;
+move_verb       = "move" | "put" | "place" | "attach" | "connect" ;
 
-dist_pred       = "is" , "within" , quantity , "of" , ident
-                | "is" , "at" , "least" , quantity , "from" , ident
-                | "is" , quantity , "from" , ident
-                | "is" , "near" , ident
-                | "is" , "far" , "from" , ident ;
+define_decl     = "define" , article_a , NAME , ":" , { action } , "end" ;
+repeat_decl     = "repeat" , ref , integer , "times" , "along" , signed_axis ,
+                  "spacing" , quantity , "," , "called" , the_np ;   (* SPATIAL array, C5 *)
+override_stmt   = "the" , ordinal , type_name , "is" , article_a , type_name ;  (* houses[k] override *)
+keyframe_stmt   = ref , "at" , quantity , "is" , "at" , point ;
 
-align_pred      = "faces" , ident
-                | "points" , "at" , ident
-                | "is" , ( "aligned" , "with" | "flush" , "with" ) , ident
-                | "is" , ( "parallel" , "to" | "perpendicular" , "to" ) , ident ;
-
-motion_pred     = "moves" , ( "to" | "toward" | "away" , "from" ) , ident
-                | "passes" , ( "behind" | "in" , "front" , "of" | "over" | "through" ) , ident
-                | "enters" , ident
-                | "leaves" , ident
-                | "comes" , "to" , "rest" , "on" , ident ;
-
-(* ---- 7. composition and time — LEXICON §7 ---- *)
-statement       = composed_clause | allen_stmt | hold_stmt | keyframe_stmt
-                | temporal_repeat_stmt | no_stmt | every_stmt | count_stmt | constraint_stmt ;
-
-composed_clause = clause , { ( "then" | "and" | "while" | "or" ) , clause } ;
-clause          = [ ident ] , [ dynamics_adverb ] , predicate ;   (* subject elidable after 1st clause *)
-full_clause     = ident , predicate ;
-
-allen_stmt      = full_clause , allen_op , full_clause ;
+(* ---- CLAIMS — the spec, the only scored lines. LEXICON §4-8. ---- *)
+claim           = simple_claim | quantified_claim | temporal_claim ;
+simple_claim    = subject , [ "must" ] , predicate , { connective , tail_claim } ;
+subject         = ref ;
+tail_claim      = [ subject ] , predicate ;   (* subject elidable after the first clause *)
+connective      = "then" | "and" | "while" | "or" | allen_op ;
 allen_op        = "before" | "after" | "during" | "until" ;
 
-hold_stmt            = "hold" , full_clause , "for" , quantity ;
-temporal_repeat_stmt = "repeat" , ident , integer , "times" ;   (* temporal — no "along", cf. §10 *)
-keyframe_stmt        = ident , "at" , quantity , "is" , "at" , "(" , coord , "," , coord ,
-                        [ "," , coord ] , ")" ;
-coord                = quantity | number ;
+quantified_claim = "no" , "two" , set , "overlap"
+                 | "every" , ident , "in" , the_np , predicate
+                 | "there" , "are" , "exactly" , integer , set ;
+temporal_claim   = "hold" , simple_claim , "for" , quantity ;
 
-(* ---- 8. negation, quantification, coverage — LEXICON §8 ---- *)
-no_stmt         = "no" , "two" , ident , "overlap"
-                | "no" , ident , predicate ;               (* generalized from "no <x> is inside <y>",
-                                                                see note [7] *)
-every_stmt      = "every" , ident , "in" , ident , predicate ;
-count_stmt      = "there" , "are" , "exactly" , integer , set_noun ;
-set_noun        = ident , [ ( "within" | "in" ) , ident ] ;
+(* ---- PREDICATES — the closed relation set, LEXICON §5-7 ---- *)
+predicate       = top_pred | dir_pred | dist_pred | orient_pred | motion_pred ;
 
-(* ---- 9. assertion vs constraint — LEXICON §9 ---- *)
-(* bare statement = assertion, via `predicate` above. `must` marks a constraint; the only cited
-   instance is is-form ("token must be inside plaza") — see note [3] for the bare-verb forms. *)
-constraint_stmt      = ident , "must" , "be" , is_infinitive_tail , ident
-                     | ident , "must" , bare_infinitive_tail , ident ;
-is_infinitive_tail   = top_is_tail | dir_tail | "aligned" , "with" | "flush" , "with"
-                     | "parallel" , "to" | "perpendicular" , "to" | "near" | "far" , "from" ;
-bare_infinitive_tail = "touch" | "rest" , "on" | "sit" , "on" | "overlap" | "contain"
-                     | "coincide" , "with" | "face" | "point" , "at" | "move" , "to"
-                     | "move" , "toward" | "move" , "away" , "from" | "pass" , "behind"
-                     | "pass" , "in" , "front" , "of" | "pass" , "over" | "pass" , "through"
-                     | "enter" | "leave" | "come" , "to" , "rest" , "on" ;
+top_pred        = "is" , ( "clear" , "of" | "inside" | "within" ) , ref
+                | ( "touches" | "overlaps" | "contains" | "coincides" , "with" ) , ref
+                | ( "rests" | "sits" ) , "on" , ref ;
+dir_pred        = "is" , dir_word , ref , [ seen_from ]
+                | "is" , compass , ref ;
+dir_word        = "above" | "below" | "left" , "of" | "right" , "of"
+                | "in" , "front" , "of" | "behind" ;
+compass         = ( "north" | "south" | "east" | "west" ) , "of" ;
+seen_from       = "seen" , "from" , ref , [ "," , ( "mirrored" | "rotated" | "shifted" ) ] ;
+dist_pred       = "is" , "within" , quantity , "of" , ref
+                | "is" , "at" , "least" , quantity , "from" , ref
+                | "is" , quantity , "from" , ref
+                | "is" , ( "near" | "far" , "from" ) , ref ;
+orient_pred     = "faces" , ref
+                | "points" , "at" , ref
+                | "is" , ( "aligned" | "flush" ) , "with" , ref
+                | "is" , ( "parallel" | "perpendicular" ) , "to" , ref ;
+motion_pred     = "passes" , ( "behind" | "in" , "front" , "of" | "over" | "through" ) , ref
+                | ( "enters" | "leaves" ) , ref
+                | "moves" , ( "to" | "toward" | "away" , "from" ) , ref
+                | "comes" , "to" , "rest" , "on" , ref ;
 
-(* ---- 10. modules — LEXICON §10 ---- *)
-module_decl          = "module" , ident , { entity_decl | statement } , "end" ;
-repeat_spatial_decl   = "repeat" , ident , integer , "times" , "along" , signed_axis ,
-                        "spacing" , ( quantity | NAME ) , "as" , ident ;
-override_stmt         = ident , "[" , integer , "]" , "is" , "a" , ident ;
-physics_decl           = "physics" , ident , "," , "gravity" , signed_number ;
-dynamics_adverb        = "quickly" | "slowly" | "suddenly" | "smoothly" | "directly" ;
-
-(* ---- lexical primitives ---- *)
+(* ---- REFERENCES + lexical primitives ---- *)
+ref             = "the" , ( type_name | NAME | ordinal , type_name ) ;  (* always `the` — LEXICON §2 *)
+the_np          = "the" , ( NAME | type_name ) ;
+set             = [ "the" ] , ( "objects" | type_name , [ "s" ] | NAME ) ;
+type_name       = ident ;                              (* resolved against TYPES.md ontology *)
+ordinal         = integer , ( "st" | "nd" | "rd" | "th" ) ;
+point           = "(" , coord , "," , coord , [ "," , coord ] , ")" ;
+coord           = quantity | signed_number ;
+dim             = quantity | number ;                  (* bare number inherits the declared units *)
+dof             = ident , { "." , ident } ;
 signed_axis     = ( "+" | "-" ) , ( "X" | "Y" | "Z" ) ;
-quantity        = number , unit ;                  (* fused lexeme, no space: 5mm, 16px, 0.5deg *)
-unit            = "m" | "mm" | "px" | "cells" | "s" | "ms" | "deg" ;
+quantity        = number , unit ;                      (* fused lexeme: 5mm, 16px, 0.5deg, 1.2s *)
+unit            = "m" | "mm" | "cm" | "px" | "deg" | "s" | "ms" ;
 signed_number   = [ "-" ] , number ;
 number          = digits , [ "." , digits ] ;
 integer         = digits ;
 digits          = digit , { digit } ;
 digit           = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
 ident           = lower_letter , { letter | digit | "_" } ;
-NAME            = upper_letter , { letter | digit | "_" } ;
+NAME            = ident ;                               (* a name bound by `called`; same lexeme class *)
 letter          = lower_letter | upper_letter ;
 lower_letter    = "a" | "..." | "z" ;
 upper_letter    = "A" | "..." | "Z" ;
 
-(* ======================= verification against EXAMPLES.md ======================= *)
-(* All six examples parse token-for-token under this grammar:
-   1. login_form  — units/tolerance/entity_decl(sized)/top_pred(within)/dir_pred(above)/
-                     dist_pred(at least...from)/no_stmt(no two)/count_stmt(within qualifier).
-   2. desk_setup  — dir_pred(in front of, no seen_from -> locale reading)/align_pred(faces)/
-                     top_pred(rests on)/dir_pred(left of, no seen_from — syntactically valid,
-                     rejected only by the semantic arity gate, note [1]).
-   3. plaza       — view_decl/top_pred(within)/dir_pred(left of / in front of, with seen_from).
-   4. casinhas    — frame_decl/let_decl/module_decl/repeat_spatial_decl/override_stmt/
-                     every_stmt/no_stmt/count_stmt; tolerance_decl absent (note [2]).
-   5. ball_roll   — keyframe_stmt x2/composed_clause(motion_pred "then" dir_pred, elided
-                     subject)/hold_stmt.
-   6. drop        — physics_decl/keyframe_stmt/motion_pred(comes to rest on)/allen_stmt(before). *)
+(* ============================================================================
+   SEMANTIC SIDE CONDITIONS — checked after parsing; EBNF cannot express them.
+   ============================================================================
+   [S1] The frame rule / arity gate (LEXICON §6, SPEC §1.2). A `dir_word` in
+        {left of, right of, in front of, behind} is grammatical, but a later
+        pass resolves the anchor: with `seen from V` -> group; without, and the
+        GROUND has an intrinsic front (TYPES.md) -> locale; without, and the
+        ground has NO front -> ERROR ("ball has no front"). Example 2's
+        `the desk is left of the ball.` parses here and is rejected there.
+   [S2] Uniqueness (LEXICON §2). `the <type>` resolves iff exactly one entity of
+        that type exists; else a disambiguation error. `called <name>` + `the
+        <name>` is the escape hatch. Not context-free.
+   [S3] Identity/definedness. `the X` must already be introduced; `a X` must not
+        collide with an existing name. The article makes the INTENT syntactic;
+        the symbol table enforces the FACT.
+   [S4] Mandatory tolerance (LEXICON §1). A document with no `tolerance_decl`
+        does not validate. The grammar cannot count occurrences; document
+        validation does (the checker's loader raises on a missing tolerance).
+   [S5] Ordinal type errors (C2/C3). `... within <q> of ...` with an ordinal
+        unit, or `hold ... for <q>` on a `steps` timebase, parse cleanly and are
+        rejected as type errors at check time — a different verdict from FALSE.
 
-(* ======================= gaps and generalizations ======================= *)
-(* [1] The frame arity gate (locale needs an intrinsic-front ground; group needs a bound viewpoint,
-       SPEC.md §1.2) is a symbol-table/semantic check, not context-free — the grammar accepts the
-       surface form, a later pass rejects it (example 2's "ball is left of desk").
-   [2] LEXICON.md §1 calls `tolerance` mandatory, yet EXAMPLES.md 3/4/6 omit it. `tolerance_decl`
-       is syntactically optional here to stay faithful to the literal examples; mandatoriness is
-       enforced by document validation, not by this grammar.
-   [3] `bare_infinitive_tail` (constraint mode for non-is relations) is not literally cited in
-       LEXICON.md — only "token must be inside plaza" is. The forms are the regular-English
-       infinitive of each already-cited finite verb (touches -> touch, rests on -> rest on, ...).
-   [4] `temporal_repeat_stmt`'s `<action>` (LEXICON §7, "repeat <action> 3 times") has no worked
-       example and no prose grammar given anywhere; grammarized as a bare `ident`, unverified.
-   [5] `dof_free_decl`'s `dof` has no worked example; grammarized as a dotted ident path by
-       analogy with SPEC.md's `free chair.position.z`, not from LEXICON/EXAMPLES text directly.
-   [6] `dim` accepts bare `number` because EXAMPLES.md mixes bare and unit-tagged dimensions in the
-       same `sized` list ("1.6 x 0.8 x 0.75m"); such bare numbers inherit the scene's declared
-       `units` and are not "dimensionless" in the sense of quaternion components or counts.
-   [7] `no_stmt`'s second alternative generalizes LEXICON's single cited case ("no <x> is inside
-       <y>") to any predicate, by analogy with `every_stmt` and SPEC.md §1.5's general
-       `none(pred)`.
-   [8] No prose syntax for raw quaternion components is attested in LEXICON.md or EXAMPLES.md, so
-       none is grammarized; orientation is never authored directly in the given controlled-English
-       surface. *)
+   ============================================================================
+   PARSE TRACE against EXAMPLES.md — every line derives from `line`:
+   ============================================================================
+   1. UI       profile_decl / units_decl / tolerance_decl / introduce(+attribute
+               `of size`) x3 / simple_claim(top within, dir above, dist
+               "at least ... from") / quantified_claim(no two ..., there are
+               exactly 3 objects).
+   2. desk     profile_decl / units_decl / tolerance_decl x2 / introduce(bare,
+               `of radius`, and +spatial_tail `in front of the desk` / `on the
+               desk`) / simple_claim(faces; `left of the ball` -> parses, [S1]
+               rejects).
+   3. plaza    introduce(`of size`, +spatial_tail `inside the plaza`) /
+               view_decl / simple_claim(dir `left of ... seen from ne_cam`,
+               `in front of ... seen from ne_cam`).
+   4. casinhas profile_decl / units_decl / tolerance_decl / frame_decl /
+               define_decl{ introduce, introduce+spatial_tail `on the slab` } /
+               repeat_decl / override_stmt(`the 7th house is a corner unit`) /
+               quantified_claim(every ... rests on ..., no two ..., there are
+               exactly 7 houses).
+   5. ball     profile_decl / units_decl(meters and seconds) / tolerance_decl /
+               introduce x2 / keyframe_stmt x2 / simple_claim(motion `passes
+               behind` + connective `then` + elided-subject `is clear of`) /
+               temporal_claim(`hold ... for 0.3s`).
+   6. drop     physics_decl / introduce x3 / keyframe_stmt / simple_claim(motion
+               `comes to rest on`) / simple_claim(`touches ... before touches
+               ...` via allen_op connective).
+
+   Productions added beyond LEXICON's literal citations, and why:
+   - `attribute` (`of radius` cited; `of size` added as the box analogue, and
+     documented in EXAMPLES.md's preamble).
+   - `override_stmt` uses the ordinal form `the 7th house` (LEXICON §9 cites
+     `the 7th house is a corner unit.` verbatim — kept exactly).
+   - `set` allows `objects` (LEXICON §8 `no two <set>`; `objects` is the
+     universal set) and a pluralized type (`houses`). No new relations. *)
