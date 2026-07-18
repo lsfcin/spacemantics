@@ -1,0 +1,3 @@
+from .svg import render_document as render_document
+
+def main(argv: list[str] | None = None) -> int: ...

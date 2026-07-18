@@ -1,0 +1,17 @@
+t01_lamp_on_desk         | WITHOUT SOLVED   2/2 a1 | BLIND SOLVED   2/2 a1 | WITH SOLVED   2/2 a1
+t02_stack_three          | WITHOUT SOLVED   3/3 a1 | BLIND SOLVED   3/3 a1 | WITH SOLVED   3/3 a1
+t03_ball_near_clear      | WITHOUT SOLVED   2/2 a1 | BLIND SOLVED   2/2 a1 | WITH SOLVED   2/2 a1
+t04_east_chain           | WITHOUT SOLVED   2/2 a1 | BLIND SOLVED   2/2 a1 | WITH SOLVED   2/2 a1
+t05_chair_faces_desk     | WITHOUT SOLVED   2/2 a1 | BLIND SOLVED   2/2 a1 | WITH SOLVED   2/2 a1
+t06_crate_in_room        | WITHOUT SOLVED   1/1 a1 | BLIND SOLVED   1/1 a1 | WITH   --     0/1 a3
+t07_ball_on_high_shelf   | WITHOUT SOLVED   2/2 a1 | BLIND SOLVED   2/2 a1 | WITH SOLVED   2/2 a1
+t08_four_chairs          | WITHOUT   --     ERR a1 | BLIND   --     1/3 a3 | WITH   --     1/3 a3
+t09_above_below          | WITHOUT   --     ERR a1 | BLIND   --     ERR a3 | WITH   --     ERR a3
+t10_group_left           | WITHOUT   --     ERR a1 | BLIND   --     ERR a3 | WITH   --     ERR a3
+
+=== texpace pilot — model gemini:gemini-2.5-flash, k=3, 10 tasks ===
+WITHOUT : solved 7/10  |  claims 14/14  (100% of claims, 70% of tasks)
+BLIND   : solved 7/10  |  claims 15/19  (79% of claims, 70% of tasks)
+WITH    : solved 6/10  |  claims 14/17  (82% of claims, 60% of tasks)
+
+wrote /mnt/workspace/code/spacemantics/bench/results.json

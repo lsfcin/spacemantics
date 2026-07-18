@@ -1,0 +1,176 @@
+{
+  "model": "gemini:gemini-2.5-flash-lite",
+  "k": 3,
+  "summary": {
+    "without": {
+      "n": 6,
+      "solved": 4,
+      "passed": 25,
+      "scored": 30,
+      "claim_pct": 83.33333333333333,
+      "solve_pct": 66.66666666666667
+    },
+    "blind": {
+      "n": 6,
+      "solved": 4,
+      "passed": 21,
+      "scored": 30,
+      "claim_pct": 70.0,
+      "solve_pct": 66.66666666666667
+    },
+    "with": {
+      "n": 6,
+      "solved": 4,
+      "passed": 21,
+      "scored": 30,
+      "claim_pct": 70.0,
+      "solve_pct": 66.66666666666667
+    }
+  },
+  "rows": [
+    {
+      "task": "h01_six_in_a_shelf",
+      "without": {
+        "solved": true,
+        "passed": 7,
+        "scored": 7,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 7,
+        "scored": 7,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 7,
+        "scored": 7,
+        "attempts": 1,
+        "error": ""
+      }
+    },
+    {
+      "task": "h02_tight_stack_four",
+      "without": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 1,
+        "error": ""
+      }
+    },
+    {
+      "task": "h03_proximity_chain",
+      "without": {
+        "solved": false,
+        "passed": 3,
+        "scored": 4,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": false,
+        "passed": 0,
+        "scored": 4,
+        "attempts": 3,
+        "error": "Expecting ',' delimiter: line 2 column 355 (char 356)"
+      },
+      "with": {
+        "solved": false,
+        "passed": 0,
+        "scored": 4,
+        "attempts": 3,
+        "error": "Extra data: line 1 column 47 (char 46)"
+      }
+    },
+    {
+      "task": "h04_nested_containment",
+      "without": {
+        "solved": true,
+        "passed": 2,
+        "scored": 2,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 2,
+        "scored": 2,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 2,
+        "scored": 2,
+        "attempts": 1,
+        "error": ""
+      }
+    },
+    {
+      "task": "h05_compass_ring",
+      "without": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 1,
+        "error": ""
+      }
+    },
+    {
+      "task": "h06_desk_workstation",
+      "without": {
+        "solved": false,
+        "passed": 1,
+        "scored": 5,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": false,
+        "passed": 0,
+        "scored": 5,
+        "attempts": 3,
+        "error": "rate-limited after 4 retries: HTTP 429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota,"
+      },
+      "with": {
+        "solved": false,
+        "passed": 0,
+        "scored": 5,
+        "attempts": 3,
+        "error": "rate-limited after 4 retries: HTTP 429: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota,"
+      }
+    }
+  ]
+}

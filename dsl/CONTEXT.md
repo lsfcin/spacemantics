@@ -1,5 +1,6 @@
 # texpace DSL
 > The texpace language: concept inventory, conventions reconciliation, spec, grammar, adapter conformance
+> spec: SPEC.md
 
 Design home of **texpace** (text + space): a spatial *and* temporal DSL whose every kernel construct is
 mechanically checkable.
@@ -46,6 +47,6 @@ Grounding: `academy/papers/spacemantics/outputs/texpace-foundations.md` (researc
 | [`INVENTORY-ADVISORY.md`](INVENTORY-ADVISORY.md) | — | — | texpace — Concept Inventory: advisory and out-of-scope |
 | [`INVENTORY.md`](INVENTORY.md) | — | — | texpace — Concept Inventory |
 | [`LEXICON.md`](LEXICON.md) | — | — | texpace — Controlled-English Lexicon (v2) |
-| [`SPEC.md`](SPEC.md) | — | — | texpace — Language Spec v1 |
+| [`SPEC.md`](SPEC.md) | — | — | SPEC: texpace DSL |
 | [`TYPES.md`](TYPES.md) | — | — | texpace — Type Ontology |
 <!-- routing:end -->

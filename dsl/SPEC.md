@@ -1,4 +1,45 @@
-# texpace — Language Spec v1
+# SPEC: texpace DSL
+<!-- Machine-parseable module contract (spec-driven development) + the full language reference below. -->
+spec-version: 0
+status: locked
+verify: make verify-fast
+
+<!-- status: locked  → read-gate armed: editing this module's files requires reading this SPEC first.
+     verify: make verify-fast → the ## Examples map to cases in `tests/` (pytest); a broken example
+     turns verify:fast red and the commit gate blocks it. Language reference is normative, below. -->
+
+## Inputs
+- A **texpace document** in either surface — controlled-English *prose* or *JSON* — over one AST (§Surfaces).
+- A mandatory document **header**: `texpace <ver>`, `profile`, `frame`, `units`, `timebase`, `tolerance` (§0). Missing header → does not parse.
+- Three line kinds only: `setup` · `action` · `claim` (§"Three kinds of line"). Prose lexicon is **closed** ([LEXICON.md](LEXICON.md)).
+
+## Outputs
+- A parsed **AST** (surface-independent) the checker consumes; prose↔JSON are bijective.
+- Per `claim`, a deterministic **verdict** from the four predicates `DIR · DIST · TOP · PATH` (§1.3), graded against the declared `tolerance`.
+- Parse-time **errors** for arity-gate / article-type / lexicon violations (never silent guesses).
+
+## Invariants
+- **Checkability filter:** no concept enters the kernel without a deterministic checker predicate (§1).
+- **Closed lexicon:** any phrasing outside [LEXICON.md](LEXICON.md) is a parse error, never an interpretation.
+- **Two surfaces, one AST:** a scene emitted to prose and JSON parses back to the *same* canonical form and scores identically (§5 acceptance test).
+- **Arity gate at parse time:** `locale` requires an intrinsic-front ground; `group` requires a bound viewpoint — violations are unrepresentable, not mis-scored (§1.2).
+- **Only `claim` lines are scored;** `setup`/`action` never reach the checker as primitives (§"Three kinds of line").
+- **No Euler storage** (orientation = unit quaternion, C4); ordinal quantities never enter metric predicates (C2); durations illegal on ordinal timebases (C3).
+- **Adapter bijection:** a format↔canonical disagreement indicts the adapter, never the checker (§5).
+
+## Examples
+- Kernel-only → fully-extended worked scenes: [EXAMPLES.md](EXAMPLES.md) (six, prose surface).
+- Predicate conformance is exercised by the suite behind `make verify-fast`: `tests/test_direction.py` (`DIR`), `tests/test_metrics.py` (`DIST`), `tests/test_quantifiers.py` (`none/every/count`), `tests/test_declarations.py` (header/identity/arity).
+- Acceptance test (adapter round-trip): a scene → two formats → identical canonical form (§5).
+
+## Notes
+Goal: [[spec-driven-development]] · [[spacemantics]]. This SPEC is the module contract; the sections
+below are the normative **language reference** it points to. Reading order for the whole `dsl/` module is
+in [CONTEXT.md](CONTEXT.md). Companion contracts: [CONFORMANCE.md](CONFORMANCE.md) (adapters), [INVENTORY.md](INVENTORY.md) (per-concept verdicts).
+
+---
+
+# Language Reference (normative) — texpace v1
 > Layered spatial+temporal DSL: kernel · modules · profiles · adapters. Every core construct is mechanically checkable.
 
 **Governing principle (from M0.5):** the capability lift comes from the **checker**, not the grammar

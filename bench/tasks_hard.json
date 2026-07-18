@@ -1,0 +1,121 @@
+{
+  "_comment": "HARD pilot: the regime where a one-shot baseline breaks. Dense multi-constraint scenes at tight tolerance (1cm / 5deg). 'solved' requires EVERY claim to pass, so per-task success needs all of 4-8 relations right at once — where checker feedback should help most.",
+  "header": {
+    "profile": "3d",
+    "timebase": "seconds",
+    "tolerance": { "length": "1cm", "angle": "5deg", "time": "1ms" }
+  },
+  "tasks": [
+    {
+      "id": "h01_six_in_a_shelf", "level": "L3",
+      "prompt": "A shelf spans x from -1.5 to +1.5 (3m wide), fixed, top at z=0.5. Place six 0.5x0.4x0.4m boxes b1..b6 in a single west-to-east row resting on the shelf top, packed so each is east of the previous, none overlapping, all resting on the shelf. They fill the shelf exactly (6 x 0.5 = 3.0m).",
+      "entities": [
+        { "name": "shelf", "type": "shelf", "shape": {"kind":"box","extent":[3.0,0.4,0.05]}, "fixed": true, "position": [0,0,0.475] },
+        { "name": "b1", "type": "crate", "shape": {"kind":"box","extent":[0.5,0.4,0.4]} },
+        { "name": "b2", "type": "crate", "shape": {"kind":"box","extent":[0.5,0.4,0.4]} },
+        { "name": "b3", "type": "crate", "shape": {"kind":"box","extent":[0.5,0.4,0.4]} },
+        { "name": "b4", "type": "crate", "shape": {"kind":"box","extent":[0.5,0.4,0.4]} },
+        { "name": "b5", "type": "crate", "shape": {"kind":"box","extent":[0.5,0.4,0.4]} },
+        { "name": "b6", "type": "crate", "shape": {"kind":"box","extent":[0.5,0.4,0.4]} }
+      ],
+      "place": ["b1","b2","b3","b4","b5","b6"],
+      "claims": [
+        { "pred":"DIR","fig":"b2","gnd":"b1","term":"east","anchor":{"kind":"world"}, "text":"b2 east of b1" },
+        { "pred":"DIR","fig":"b3","gnd":"b2","term":"east","anchor":{"kind":"world"}, "text":"b3 east of b2" },
+        { "pred":"DIR","fig":"b4","gnd":"b3","term":"east","anchor":{"kind":"world"}, "text":"b4 east of b3" },
+        { "pred":"DIR","fig":"b5","gnd":"b4","term":"east","anchor":{"kind":"world"}, "text":"b5 east of b4" },
+        { "pred":"DIR","fig":"b6","gnd":"b5","term":"east","anchor":{"kind":"world"}, "text":"b6 east of b5" },
+        { "quant":"every","over":{"set":{"type":"crate"},"as":"a"},"pred":{"pred":"TOP","b":"shelf","rcc":["EC"]}, "text":"every box rests on the shelf" },
+        { "quant":"none","over":{"pairs":{"type":"crate"}},"pred":{"pred":"TOP","rcc":["PO","EQ","TPP","TPPi","NTPP","NTPPi"]}, "text":"no two boxes overlap" }
+      ]
+    },
+    {
+      "id": "h02_tight_stack_four", "level": "L3",
+      "prompt": "Stack four cubes c1..c4 (each exactly 0.6x0.6x0.6m) on a floor whose top is at z=0. Each cube rests flush on the one below (c1 on floor, c2 on c1, c3 on c2, c4 on c3), perfectly aligned in x and y (all centered at x=0,y=0). Tolerance is 1cm, so centers must be right.",
+      "entities": [
+        { "name": "floor", "type": "slab", "shape": {"kind":"box","extent":[4,4,0.1]}, "fixed": true, "position": [0,0,-0.05] },
+        { "name": "c1", "type": "crate", "shape": {"kind":"box","extent":[0.6,0.6,0.6]} },
+        { "name": "c2", "type": "crate", "shape": {"kind":"box","extent":[0.6,0.6,0.6]} },
+        { "name": "c3", "type": "crate", "shape": {"kind":"box","extent":[0.6,0.6,0.6]} },
+        { "name": "c4", "type": "crate", "shape": {"kind":"box","extent":[0.6,0.6,0.6]} }
+      ],
+      "place": ["c1","c2","c3","c4"],
+      "claims": [
+        { "pred":"TOP","a":"c1","b":"floor","rcc":["EC"], "text":"c1 rests on the floor" },
+        { "pred":"TOP","a":"c2","b":"c1","rcc":["EC"], "text":"c2 rests on c1" },
+        { "pred":"TOP","a":"c3","b":"c2","rcc":["EC"], "text":"c3 rests on c2" },
+        { "pred":"TOP","a":"c4","b":"c3","rcc":["EC"], "text":"c4 rests on c3" },
+        { "pred":"ALIGNED","a":"c4","b":"c1","axis":"x", "text":"c4 aligned with c1 in x" },
+        { "pred":"ALIGNED","a":"c4","b":"c1","axis":"y", "text":"c4 aligned with c1 in y" }
+      ]
+    },
+    {
+      "id": "h03_proximity_chain", "level": "L3",
+      "prompt": "Place three 0.3x0.3x0.3m boxes A, B, C so that: A is within 0.6m of B; B is within 0.6m of C; A is at least 1.0m from C (A and C on opposite sides of B); and no two boxes touch or overlap.",
+      "entities": [
+        { "name": "A", "type": "crate", "shape": {"kind":"box","extent":[0.3,0.3,0.3]} },
+        { "name": "B", "type": "crate", "shape": {"kind":"box","extent":[0.3,0.3,0.3]} },
+        { "name": "C", "type": "crate", "shape": {"kind":"box","extent":[0.3,0.3,0.3]} }
+      ],
+      "place": ["A","B","C"],
+      "claims": [
+        { "pred":"DIST","fig":"A","gnd":"B","op":"<","q":{"value":0.6,"unit":"m"}, "text":"A within 0.6m of B" },
+        { "pred":"DIST","fig":"B","gnd":"C","op":"<","q":{"value":0.6,"unit":"m"}, "text":"B within 0.6m of C" },
+        { "pred":"DIST","fig":"A","gnd":"C","op":">","q":{"value":1.0,"unit":"m"}, "text":"A at least 1.0m from C" },
+        { "quant":"none","over":{"pairs":{"type":"crate"}},"pred":{"pred":"TOP","rcc":["PO","EQ","TPP","TPPi","NTPP","NTPPi","EC"]}, "text":"no two boxes touch or overlap" }
+      ]
+    },
+    {
+      "id": "h04_nested_containment", "level": "L3",
+      "prompt": "A room is a 4x4x3m region centered at origin (fixed). Place a medium 2x2x2m box fully inside the room (not touching any face), and a small 0.5x0.5x0.5m box fully inside the MEDIUM box (not touching its faces). Both containments must be strict, tolerance 1cm.",
+      "entities": [
+        { "name": "room", "type": "room", "shape": {"kind":"box","extent":[4,4,3]}, "fixed": true, "position": [0,0,1.5] },
+        { "name": "medium", "type": "crate", "shape": {"kind":"box","extent":[2,2,2]} },
+        { "name": "small", "type": "crate", "shape": {"kind":"box","extent":[0.5,0.5,0.5]} }
+      ],
+      "place": ["medium","small"],
+      "claims": [
+        { "pred":"TOP","a":"medium","b":"room","rcc":["NTPP"], "text":"medium is strictly inside the room" },
+        { "pred":"TOP","a":"small","b":"medium","rcc":["NTPP"], "text":"small is strictly inside the medium box" }
+      ]
+    },
+    {
+      "id": "h05_compass_ring", "level": "L3",
+      "prompt": "A post (0.2x0.2x2m) is fixed at the origin. Place four 0.4x0.4x0.4m markers around it: m_n to the NORTH (+Y), m_s to the SOUTH (-Y), m_e to the EAST (+X), m_w to the WEST (-X). Each marker must be between 1m and 2m from the post (measured surface-to-surface), and no marker may touch the post or another marker.",
+      "entities": [
+        { "name": "post", "type": "crate", "shape": {"kind":"box","extent":[0.2,0.2,2]}, "fixed": true, "position": [0,0,1] },
+        { "name": "m_n", "type": "crate", "shape": {"kind":"box","extent":[0.4,0.4,0.4]} },
+        { "name": "m_s", "type": "crate", "shape": {"kind":"box","extent":[0.4,0.4,0.4]} },
+        { "name": "m_e", "type": "crate", "shape": {"kind":"box","extent":[0.4,0.4,0.4]} },
+        { "name": "m_w", "type": "crate", "shape": {"kind":"box","extent":[0.4,0.4,0.4]} }
+      ],
+      "place": ["m_n","m_s","m_e","m_w"],
+      "claims": [
+        { "pred":"DIR","fig":"m_n","gnd":"post","term":"north","anchor":{"kind":"world"}, "text":"m_n is north of the post" },
+        { "pred":"DIR","fig":"m_s","gnd":"post","term":"south","anchor":{"kind":"world"}, "text":"m_s is south of the post" },
+        { "pred":"DIR","fig":"m_e","gnd":"post","term":"east","anchor":{"kind":"world"}, "text":"m_e is east of the post" },
+        { "pred":"DIR","fig":"m_w","gnd":"post","term":"west","anchor":{"kind":"world"}, "text":"m_w is west of the post" },
+        { "pred":"DIST","fig":"m_n","gnd":"post","op":"<","q":{"value":2.0,"unit":"m"}, "text":"m_n within 2m of the post" },
+        { "quant":"none","over":{"pairs":{"type":"crate"}},"pred":{"pred":"TOP","rcc":["PO","EQ","TPP","TPPi","NTPP","NTPPi","EC"]}, "text":"no two objects touch" }
+      ]
+    },
+    {
+      "id": "h06_desk_workstation", "level": "L3",
+      "prompt": "Build a desk workstation. Desk 1.6x0.8x0.75m at origin (top z=0.75, front along +Y). Place: a monitor (0.5x0.1x0.35m) resting on the desk near its back edge; a keyboard (0.45x0.15x0.03m) resting on the desk in front of the monitor (closer to +Y); a lamp (0.15x0.15x0.5m) resting on the desk. Nothing may overlap. The keyboard must be in front of the monitor (desk's local frame). All three items rest on the desk top.",
+      "entities": [
+        { "name": "desk", "type": "desk", "shape": {"kind":"box","extent":[1.6,0.8,0.75]}, "fixed": true, "position": [0,0,0.375] },
+        { "name": "monitor", "type": "crate", "shape": {"kind":"box","extent":[0.5,0.1,0.35]} },
+        { "name": "keyboard", "type": "crate", "shape": {"kind":"box","extent":[0.45,0.15,0.03]} },
+        { "name": "lamp", "type": "lamp", "shape": {"kind":"box","extent":[0.15,0.15,0.5]} }
+      ],
+      "place": ["monitor","keyboard","lamp"],
+      "claims": [
+        { "pred":"TOP","a":"monitor","b":"desk","rcc":["EC"], "text":"the monitor rests on the desk" },
+        { "pred":"TOP","a":"keyboard","b":"desk","rcc":["EC"], "text":"the keyboard rests on the desk" },
+        { "pred":"TOP","a":"lamp","b":"desk","rcc":["EC"], "text":"the lamp rests on the desk" },
+        { "pred":"DIR","fig":"keyboard","gnd":"monitor","term":"north","anchor":{"kind":"world"}, "text":"the keyboard is north of (in front of) the monitor" },
+        { "quant":"none","over":{"pairs":{"type":"crate"}},"pred":{"pred":"TOP","rcc":["PO","EQ","TPP","TPPi","NTPP","NTPPi"]}, "text":"no two desk items overlap" }
+      ]
+    }
+  ]
+}

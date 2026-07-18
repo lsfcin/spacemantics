@@ -1,0 +1,13 @@
+h01_six_in_a_shelf       | WITHOUT SOLVED   7/7 a1 | BLIND SOLVED   7/7 a1 | WITH SOLVED   7/7 a1
+h02_tight_stack_four     | WITHOUT SOLVED   6/6 a1 | BLIND SOLVED   6/6 a1 | WITH SOLVED   6/6 a1
+h03_proximity_chain      | WITHOUT   --     3/4 a1 | BLIND   --     ERR a3 | WITH   --     ERR a3
+h04_nested_containment   | WITHOUT SOLVED   2/2 a1 | BLIND SOLVED   2/2 a1 | WITH SOLVED   2/2 a1
+h05_compass_ring         | WITHOUT SOLVED   6/6 a1 | BLIND SOLVED   6/6 a1 | WITH SOLVED   6/6 a1
+h06_desk_workstation     | WITHOUT   --     1/5 a1 | BLIND   --     ERR a3 | WITH   --     ERR a3
+
+=== texpace pilot — model gemini:gemini-2.5-flash-lite, k=3, 6 tasks ===
+WITHOUT : solved 4/6  |  claims 25/30  (83% of claims, 67% of tasks)
+BLIND   : solved 4/6  |  claims 21/30  (70% of claims, 67% of tasks)
+WITH    : solved 4/6  |  claims 21/30  (70% of claims, 67% of tasks)
+
+wrote /mnt/workspace/code/spacemantics/bench/results.json

@@ -1,0 +1,150 @@
+{
+  "_comment": "Pilot benchmark: 3D object placement. The model outputs a pose per entity in `place`; fixed anchors and `claims` (ground truth) are held by the scorer. Tolerances are generous (5cm / 10deg) so the signal is getting relations RIGHT, not sub-mm precision. OVERLAP set = the RCC-8 codes that count as an illegal overlap.",
+  "header": {
+    "profile": "3d",
+    "timebase": "seconds",
+    "tolerance": { "length": "5cm", "angle": "10deg", "time": "1ms" }
+  },
+  "overlap_codes": ["PO", "EQ", "TPP", "TPPi", "NTPP", "NTPPi"],
+  "tasks": [
+    {
+      "id": "t01_lamp_on_desk", "level": "L1",
+      "prompt": "Place a desk and a lamp so the lamp sits flat on top of the desk's upper surface. The desk is 1.6 (X) by 0.8 (Y) by 0.75 (Z) meters. The lamp is 0.2 by 0.2 by 0.4 meters. They must not interpenetrate.",
+      "entities": [
+        { "name": "desk", "type": "desk", "shape": { "kind": "box", "extent": [1.6, 0.8, 0.75] } },
+        { "name": "lamp", "type": "lamp", "shape": { "kind": "box", "extent": [0.2, 0.2, 0.4] } }
+      ],
+      "place": ["desk", "lamp"],
+      "claims": [
+        { "pred": "TOP", "a": "lamp", "b": "desk", "rcc": ["EC"], "text": "the lamp rests on the desk" },
+        { "pred": "DIR", "fig": "lamp", "gnd": "desk", "term": "above", "anchor": {"kind": "world"}, "text": "the lamp is above the desk" }
+      ]
+    },
+    {
+      "id": "t02_stack_three", "level": "L1",
+      "prompt": "Stack three 1x1x1 meter cubes (c1, c2, c3) on the floor: c1 rests on the floor, c2 rests on c1, c3 rests on c2. The floor's top surface is at z=0. Do not let cubes interpenetrate.",
+      "entities": [
+        { "name": "floor", "type": "slab", "shape": { "kind": "box", "extent": [6, 6, 0.1] }, "fixed": true, "position": [0, 0, -0.05] },
+        { "name": "c1", "type": "crate", "shape": { "kind": "box", "extent": [1, 1, 1] } },
+        { "name": "c2", "type": "crate", "shape": { "kind": "box", "extent": [1, 1, 1] } },
+        { "name": "c3", "type": "crate", "shape": { "kind": "box", "extent": [1, 1, 1] } }
+      ],
+      "place": ["c1", "c2", "c3"],
+      "claims": [
+        { "pred": "TOP", "a": "c1", "b": "floor", "rcc": ["EC"], "text": "c1 rests on the floor" },
+        { "pred": "TOP", "a": "c2", "b": "c1", "rcc": ["EC"], "text": "c2 rests on c1" },
+        { "pred": "TOP", "a": "c3", "b": "c2", "rcc": ["EC"], "text": "c3 rests on c2" }
+      ]
+    },
+    {
+      "id": "t03_ball_near_clear", "level": "L1",
+      "prompt": "Place a ball (radius 0.1m) and a 1x1x1m box so the ball is within 0.5m of the box but does NOT touch it.",
+      "entities": [
+        { "name": "ball", "type": "ball", "shape": { "kind": "sphere", "radius": 0.1 } },
+        { "name": "box", "type": "crate", "shape": { "kind": "box", "extent": [1, 1, 1] } }
+      ],
+      "place": ["ball", "box"],
+      "claims": [
+        { "pred": "DIST", "fig": "ball", "gnd": "box", "op": "<", "q": {"value": 0.5, "unit": "m"}, "text": "the ball is within 0.5m of the box" },
+        { "pred": "TOP", "a": "ball", "b": "box", "rcc": ["DC"], "text": "the ball is clear of the box" }
+      ]
+    },
+    {
+      "id": "t04_east_chain", "level": "L1",
+      "prompt": "Place three 0.5x0.5x0.5m boxes a, b, c in a west-to-east line so that a is east of b, and b is east of c. (+X is east.) None may overlap.",
+      "entities": [
+        { "name": "a", "type": "crate", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.5] } },
+        { "name": "b", "type": "crate", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.5] } },
+        { "name": "c", "type": "crate", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.5] } }
+      ],
+      "place": ["a", "b", "c"],
+      "claims": [
+        { "pred": "DIR", "fig": "a", "gnd": "b", "term": "east", "anchor": {"kind": "world"}, "text": "a is east of b" },
+        { "pred": "DIR", "fig": "b", "gnd": "c", "term": "east", "anchor": {"kind": "world"}, "text": "b is east of c" }
+      ]
+    },
+    {
+      "id": "t05_chair_faces_desk", "level": "L2",
+      "prompt": "Place a desk and a chair. The chair must be in front of the desk and must face the desk. A desk's front points along its local +Y axis at identity orientation; orientation is a unit quaternion [w,x,y,z]. To make an object face -Y, rotate it 180 degrees about Z: [0,0,0,1]. Desk is 1.6x0.8x0.75m, chair 0.5x0.5x0.9m. No interpenetration.",
+      "entities": [
+        { "name": "desk", "type": "desk", "shape": { "kind": "box", "extent": [1.6, 0.8, 0.75] } },
+        { "name": "chair", "type": "chair", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.9] } }
+      ],
+      "place": ["desk", "chair"],
+      "claims": [
+        { "pred": "DIR", "fig": "chair", "gnd": "desk", "term": "front", "anchor": {"kind": "locale"}, "text": "the chair is in front of the desk" },
+        { "pred": "FACES", "a": "chair", "b": "desk", "text": "the chair faces the desk" }
+      ]
+    },
+    {
+      "id": "t06_crate_in_room", "level": "L1",
+      "prompt": "The room is a 5x5x3m region centered at the origin. Place a 1x1x1m crate fully inside the room, not touching any wall, floor, or ceiling.",
+      "entities": [
+        { "name": "room", "type": "room", "shape": { "kind": "box", "extent": [5, 5, 3] }, "fixed": true, "position": [0, 0, 1.5] },
+        { "name": "crate", "type": "crate", "shape": { "kind": "box", "extent": [1, 1, 1] } }
+      ],
+      "place": ["crate"],
+      "claims": [
+        { "pred": "TOP", "a": "crate", "b": "room", "rcc": ["NTPP"], "text": "the crate is inside the room" }
+      ]
+    },
+    {
+      "id": "t07_ball_on_high_shelf", "level": "L1",
+      "prompt": "Two shelves are fixed: shelf_low top at z=0.5, shelf_high top at z=1.5, both 1x0.3x0.05m. Place a ball (radius 0.1m) resting on the HIGH shelf. The ball must therefore be above the low shelf too.",
+      "entities": [
+        { "name": "shelf_low", "type": "shelf", "shape": { "kind": "box", "extent": [1, 0.3, 0.05] }, "fixed": true, "position": [0, 0, 0.475] },
+        { "name": "shelf_high", "type": "shelf", "shape": { "kind": "box", "extent": [1, 0.3, 0.05] }, "fixed": true, "position": [0, 0, 1.475] },
+        { "name": "ball", "type": "ball", "shape": { "kind": "sphere", "radius": 0.1 } }
+      ],
+      "place": ["ball"],
+      "claims": [
+        { "pred": "TOP", "a": "ball", "b": "shelf_high", "rcc": ["EC"], "text": "the ball rests on the high shelf" },
+        { "pred": "DIR", "fig": "ball", "gnd": "shelf_low", "term": "above", "anchor": {"kind": "world"}, "text": "the ball is above the low shelf" }
+      ]
+    },
+    {
+      "id": "t08_four_chairs", "level": "L2",
+      "prompt": "A table (1.2x1.2x0.75m) is fixed at the origin. Place exactly four chairs (each 0.5x0.5x0.9m) around it: none touching the table, none touching each other. Name them chair1..chair4.",
+      "entities": [
+        { "name": "table", "type": "table", "shape": { "kind": "box", "extent": [1.2, 1.2, 0.75] }, "fixed": true, "position": [0, 0, 0.375] },
+        { "name": "chair1", "type": "chair", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.9] } },
+        { "name": "chair2", "type": "chair", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.9] } },
+        { "name": "chair3", "type": "chair", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.9] } },
+        { "name": "chair4", "type": "chair", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.9] } }
+      ],
+      "place": ["chair1", "chair2", "chair3", "chair4"],
+      "claims": [
+        { "quant": "every", "over": {"set": {"type": "chair"}, "as": "a"}, "pred": {"pred": "TOP", "b": "table", "rcc": ["DC"]}, "text": "every chair is clear of the table" },
+        { "quant": "none", "over": {"pairs": {"type": "chair"}}, "pred": {"pred": "TOP", "rcc": ["PO", "EQ", "TPP", "TPPi", "NTPP", "NTPPi"]}, "text": "no two chairs overlap" },
+        { "pred": "COUNT", "set": {"type": "chair"}, "op": "==", "n": 4, "text": "there are exactly four chairs" }
+      ]
+    },
+    {
+      "id": "t09_above_below", "level": "L1",
+      "prompt": "A table (1.2x1.2x0.75m) is fixed at the origin, its center at z=0.375. Place a lamp ABOVE the table and a ball BELOW the table's underside (the ball should be under the tabletop, e.g. on the floor beneath).",
+      "entities": [
+        { "name": "table", "type": "table", "shape": { "kind": "box", "extent": [1.2, 1.2, 0.75] }, "fixed": true, "position": [0, 0, 0.375] },
+        { "name": "lamp", "type": "lamp", "shape": { "kind": "box", "extent": [0.2, 0.2, 0.4] } },
+        { "name": "ball", "type": "ball", "shape": { "kind": "sphere", "radius": 0.1 } }
+      ],
+      "place": ["lamp", "ball"],
+      "claims": [
+        { "pred": "DIR", "fig": "lamp", "gnd": "table", "term": "above", "anchor": {"kind": "world"}, "text": "the lamp is above the table" },
+        { "pred": "DIR", "fig": "ball", "gnd": "table", "term": "below", "anchor": {"kind": "world"}, "text": "the ball is below the table" }
+      ]
+    },
+    {
+      "id": "t10_group_left", "level": "L2",
+      "prompt": "A viewer stands at (0, 8, 1.6) looking at the origin. Place a box and a crate (each 0.5x0.5x0.5m) near the origin so that, FROM THE VIEWER'S POINT OF VIEW, the box is to the LEFT of the crate. The viewer looks along -Y, so the viewer's left is world +X.",
+      "entities": [
+        { "name": "box", "type": "crate", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.5] } },
+        { "name": "crate", "type": "crate", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.5] } }
+      ],
+      "place": ["box", "crate"],
+      "viewpoints": [ { "name": "viewer", "position": [0, 8, 1.6], "look_at": "crate" } ],
+      "claims": [
+        { "pred": "DIR", "fig": "box", "gnd": "crate", "term": "left", "anchor": {"kind": "group", "viewpoint": "viewer"}, "text": "the box is left of the crate seen from the viewer" }
+      ]
+    }
+  ]
+}
