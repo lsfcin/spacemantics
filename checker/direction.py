@@ -17,6 +17,9 @@ WORLD_TERMS: dict[str, Vec3] = {
     "west": (-1.0, 0.0, 0.0),
 }
 
+# In the 2D profile the plane is XY viewed from +Z, so "above" means +Y everywhere (C1) — not gravity.
+PLANE_TERMS: dict[str, Vec3] = {"above": (0.0, 1.0, 0.0), "below": (0.0, -1.0, 0.0)}
+
 PROJECTIVE_TERMS: frozenset[str] = frozenset({"left", "right", "front", "behind"})
 
 
@@ -26,6 +29,8 @@ class AnchorError(Exception):
 
 def axis_for(term: str, anchor: dict, scene: Scene, ground: str, t: float) -> Vec3:
     """The unit vector the term names, in the frame the anchor selects."""
+    if scene.profile == "2d" and term in PLANE_TERMS:
+        return PLANE_TERMS[term]
     if term in WORLD_TERMS:
         return WORLD_TERMS[term]
     if term not in PROJECTIVE_TERMS:

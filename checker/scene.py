@@ -82,8 +82,10 @@ class Scene:
     def region_of(self, name: str, t: float = 0.0) -> Aabb:
         entity = self.entity(name)
         position, orientation = entity.pose_at(t)
-        result = region_of_shape(entity.shape, position, orientation)
-        return result
+        region = region_of_shape(entity.shape, position, orientation)
+        if self.profile == "2d":
+            region = _flatten_z(region)
+        return region
 
     def centre_of(self, name: str, t: float = 0.0) -> Vec3:
         region = self.region_of(name, t)
@@ -123,6 +125,18 @@ def _is_a(scene: Scene, name: str, wanted: str) -> bool:
             return False
         current = definition.parent
     return False
+
+
+PLANE_HALF = 1.0e6  # a 2D scene lives in the XY plane; give Z an unbounded span so it never binds (C1).
+
+
+def _flatten_z(region: Aabb) -> Aabb:
+    """In the 2D profile the canonical plane is XY viewed from +Z (C1). Z is degenerate — remove it from
+    every topology/distance test by making the Z span cover everything, so only X and Y ever decide."""
+    lo = (region.lo[0], region.lo[1], -PLANE_HALF)
+    hi = (region.hi[0], region.hi[1], PLANE_HALF)
+    result = Aabb(lo, hi)
+    return result
 
 
 def region_of_shape(shape: dict, position: Vec3, orientation: Quat) -> Aabb:

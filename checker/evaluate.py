@@ -6,7 +6,7 @@ from itertools import combinations
 
 from . import allen, direction, metrics, rcc8
 from .report import ERROR, FAIL, PASS, SKIPPED, CheckReport, Verdict
-from .scene import Scene
+from .scene import Scene, SceneError
 from .units import Quantity, UnitTypeError
 
 QUANTIFIERS: frozenset[str] = frozenset({"none", "every"})
@@ -34,7 +34,7 @@ def _verdict_for(scene: Scene, claim: dict) -> Verdict:
     text = claim.get("text", _render(claim))
     try:
         held, detail = _evaluate(scene, claim)
-    except (UnitTypeError, direction.AnchorError, metrics.PredicateError) as failure:
+    except (UnitTypeError, direction.AnchorError, metrics.PredicateError, SceneError) as failure:
         return Verdict(ERROR, mode, text, str(failure))
     except KeyError as failure:
         return Verdict(ERROR, mode, text, f"malformed claim: missing {failure}")
