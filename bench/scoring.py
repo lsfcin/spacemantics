@@ -55,6 +55,32 @@ def _entity(spec: dict, poses: dict) -> dict:
     return entity
 
 
+def align_to_anchors(task: dict, poses: dict) -> dict:
+    """Cancel a drawing's arbitrary origin: translate every pose so the drawn fixed anchors land on
+    their task positions. Rigid translation only — every relation the claims score is untouched.
+    Without this the raw-SVG arm is graded on its choice of origin, not on spatial capability."""
+    deltas = []
+    for spec in task["entities"]:
+        if spec.get("fixed") and spec["name"] in poses:
+            drawn = poses[spec["name"]]["position"]
+            target = spec["position"]
+            deltas.append((target[0] - drawn[0], target[1] - drawn[1]))
+    result = poses
+    if deltas:
+        dx = sum(d[0] for d in deltas) / len(deltas)
+        dy = sum(d[1] for d in deltas) / len(deltas)
+        result = _translated(poses, dx, dy)
+    return result
+
+
+def _translated(poses: dict, dx: float, dy: float) -> dict:
+    moved = {}
+    for name, pose in poses.items():
+        p = pose["position"]
+        moved[name] = {"position": [p[0] + dx, p[1] + dy, p[2]], "orientation": pose["orientation"]}
+    return moved
+
+
 def score_poses(task: dict, header: dict, poses: dict) -> ScoreResult:
     """The scorer both arms share. `solved` = every scored claim passed (no FAIL, no ERROR)."""
     document = build_document(task, header, poses)

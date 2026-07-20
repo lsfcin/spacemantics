@@ -54,11 +54,12 @@ Produce the evidence: does texpace + checker lift LLM spatial capability, across
 ### Unblock first — the pilot is built, the model is missing
 The `bench/` harness (WITHOUT / blind / WITH arms, checker-scored) and the `adapters/` SVG render exist.
 The pilot ran only on Gemini (off-slate, quota-limited). To get a real number:
-- [ ] **Wire the real model slate** into `bench/model_client.py` — an Anthropic branch (Haiku 4.5,
-      Sonnet 5, Opus 4.8, Fable 5) and an opencode branch (GLM 5.2, DeepSeek v4 Pro). Provider is data;
-      one branch per transport. The moment a key exists, the WITHOUT/WITH run goes.
-- [ ] **SVG → scene parser** (round-trip) — needed to *score* a model's raw-SVG output in the WITHOUT arm.
-      `adapters/` only *emits* today.
+- [x] **Wire the real model slate** into `bench/model_client.py` — done via two local-CLI transports
+      (`cli_transport.py`): `claude-cli` (subscription `claude -p`; haiku/sonnet/opus/fable ids) and
+      `opencode` (`opencode run`; working ids: `nvidia/z-ai/glm-5.2`, `nvidia/deepseek-ai/deepseek-v4-flash`;
+      `deepseek-v4-pro` times out, Alibaba token expired, ollama-cloud needs a subscription).
+- [x] **SVG → scene parser** (`adapters/svg_parse.py`) — scores the raw-SVG arm; parsed poses are
+      anchor-aligned before scoring (relations, not origin choice). 2D suite: `bench/tasks_2d.json`.
 - [ ] **3D / isometric render** in `adapters/` — currently 2D top-down footprints only.
 
 ### Then the full design

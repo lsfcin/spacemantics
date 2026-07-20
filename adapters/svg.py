@@ -5,6 +5,7 @@ from __future__ import annotations
 from checker import FAIL, PASS, check_scene, scene_from
 
 PAD = 24
+TOP = 28
 PANEL_W = 360
 MAX_SCALE = 90.0
 PASS_FILL, PASS_STROKE = "#cfe3ff", "#3b6fb0"
@@ -18,8 +19,8 @@ def render_document(document: dict, title: str) -> str:
     report = check_scene(scene)
     broken = _failing_entities(document, report)
     shapes = _project(document)
-    body, width, height = _draw(shapes, broken, title, report)
-    svg = _wrap(body, width, height)
+    body, width, height, frame = _draw(shapes, broken, title, report)
+    svg = _wrap(body, width, height, frame)
     return svg
 
 
@@ -62,7 +63,7 @@ def _bounds(shapes: list[dict]) -> tuple[float, float, float, float]:
     return (min(xs), max(xs), min(ys), max(ys))
 
 
-def _draw(shapes: list[dict], broken: set, title: str, report) -> tuple[str, int, int]:
+def _draw(shapes: list[dict], broken: set, title: str, report) -> tuple[str, int, int, dict]:
     minx, maxx, miny, maxy = _bounds(shapes)
     world_w = max(maxx - minx, 0.5)
     world_h = max(maxy - miny, 0.5)
@@ -77,24 +78,26 @@ def _draw(shapes: list[dict], broken: set, title: str, report) -> tuple[str, int
     width = int(panel_x + PANEL_W)
     height = int(max(draw_h + 2 * PAD + 20, 40 + 22 * (len(report.verdicts) + 1)))
     body = "\n".join(elems)
-    return (body, width, height)
+    frame = {"minx": minx, "maxy": maxy, "scale": scale}
+    return (body, width, height, frame)
 
 
 def _shape_svg(shape: dict, minx: float, maxy: float, scale: float, is_broken: bool) -> str:
     fill = FAIL_FILL if is_broken else PASS_FILL
     stroke = FAIL_STROKE if is_broken else PASS_STROKE
     sx = PAD + (shape["cx"] - minx) * scale
-    sy = 28 + (maxy - shape["cy"]) * scale
-    label = f'<text x="{sx:.1f}" y="{sy:.1f}" font-size="11" text-anchor="middle" fill="{INK}">{_esc(shape["name"])}</text>'
+    sy = TOP + (maxy - shape["cy"]) * scale
+    name = _esc(shape["name"])
+    label = f'<text x="{sx:.1f}" y="{sy:.1f}" font-size="11" text-anchor="middle" fill="{INK}">{name}</text>'
     if shape["kind"] == "circle":
         radius = shape["w"] * scale
-        body = f'<circle cx="{sx:.1f}" cy="{sy:.1f}" r="{radius:.1f}" fill="{fill}" stroke="{stroke}" stroke-width="2"/>'
+        body = f'<circle id="{name}" cx="{sx:.1f}" cy="{sy:.1f}" r="{radius:.1f}" fill="{fill}" stroke="{stroke}" stroke-width="2"/>'
     else:
         w = shape["w"] * scale
         h = shape["h"] * scale
         rx = sx - w / 2
         ry = sy - h / 2
-        body = f'<rect x="{rx:.1f}" y="{ry:.1f}" width="{w:.1f}" height="{h:.1f}" fill="{fill}" stroke="{stroke}" stroke-width="2"/>'
+        body = f'<rect id="{name}" x="{rx:.1f}" y="{ry:.1f}" width="{w:.1f}" height="{h:.1f}" fill="{fill}" stroke="{stroke}" stroke-width="2"/>'
     result = body + "\n" + label
     return result
 
@@ -148,9 +151,11 @@ def _set_members(claim: dict, document: dict) -> set:
     return members
 
 
-def _wrap(body: str, width: int, height: int) -> str:
+def _wrap(body: str, width: int, height: int, frame: dict) -> str:
+    """The data-* attributes make the projection invertible — svg_parse uses them for the round-trip."""
+    meta = f'data-minx="{frame["minx"]}" data-maxy="{frame["maxy"]}" data-scale="{frame["scale"]}"'
     result = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" {meta} '
         f'viewBox="0 0 {width} {height}" style="background:#fff;border:1px solid #ddd;border-radius:8px">\n'
         f"{body}\n</svg>"
     )

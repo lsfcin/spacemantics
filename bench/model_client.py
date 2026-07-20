@@ -9,6 +9,8 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 
+from .cli_transport import CliError, run_claude_cli, run_opencode
+
 TIMEOUT_S = 60
 RATE_LIMIT_RETRIES = 4
 
@@ -30,11 +32,26 @@ class ModelError(Exception):
 
 
 def complete(model: Model, prompt: str, temperature: float = 0.2) -> str:
-    """Single-turn completion. Dispatches on `model.provider`; add a branch to widen the slate."""
+    """Single-turn completion. Dispatches on `model.provider`; add a branch to widen the slate.
+
+    CLI transports (`claude-cli`, `opencode`) ignore `temperature` — their CLIs expose no knob for it.
+    """
     if model.provider == "gemini":
         result = _gemini(model.id, prompt, temperature)
+    elif model.provider == "claude-cli":
+        result = _via_cli(run_claude_cli, model.id, prompt)
+    elif model.provider == "opencode":
+        result = _via_cli(run_opencode, model.id, prompt)
     else:
         raise ModelError(f"no transport for provider '{model.provider}'")
+    return result
+
+
+def _via_cli(transport, model_id: str, prompt: str) -> str:
+    try:
+        result = transport(model_id, prompt)
+    except CliError as failure:
+        raise ModelError(str(failure)) from failure
     return result
 
 

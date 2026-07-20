@@ -9,9 +9,15 @@ output format constant (the model emits a JSON pose per object) and toggles the 
 
 | Arm | What the model gets | Isolates |
 |---|---|---|
-| **WITHOUT** | one shot, no feedback | baseline spatial capability |
+| **SVG** | one shot of *raw SVG* (2D suites only), parsed back for scoring | baseline in the raw target format, no DSL at all |
+| **WITHOUT** | one shot, no feedback | baseline spatial capability (JSON poses) |
 | **blind** | *k* attempts, retried with "try again" and no detail | the value of *extra tries alone* (the control) |
 | **WITH** | *k* attempts, each retry carries the checker's per-claim verdicts | the value of **verifiable feedback** |
+
+The SVG arm's parsed poses are **anchor-aligned before scoring** (rigid translation onto the drawn fixed
+anchors, `scoring.align_to_anchors`): the claims are relation-level, so grading the model on its choice of
+SVG origin would measure bookkeeping, not spatial capability. Retries are single-turn: every retry prompt
+re-carries the full task plus the model's previous answer (`arms._next_prompt`).
 
 `WITH − blind` is the honest lift: the improvement that is the checker's feedback, not just more attempts.
 `blind − WITHOUT` is what retries alone buy. The checker is the **scorer for all three arms** — that is the
@@ -20,32 +26,42 @@ whole point: it owns geometric truth, so it grades the baseline and drives the l
 ## Run
 
 ```bash
-GEMINI_API_KEY=... python -m bench.run --k 3            # all tasks, 3 attempts
+python -m bench.run --model claude-cli:haiku --tasks tasks_2d.json --k 3   # subscription, no API key
+python -m bench.run --model opencode:nvidia/z-ai/glm-5.2 --tasks tasks_2d.json --k 3
+GEMINI_API_KEY=... python -m bench.run --k 3            # HTTP transport, 3D task set
 python -m bench.run --limit 2 --k 3                     # smoke test
 ```
 
-Writes `results.json`; prints a per-task row + a summary (claims-passed % and tasks-solved %).
+Providers: `claude-cli` (local `claude -p`, any alias/model id it accepts: haiku, sonnet, opus, …),
+`opencode` (local `opencode run`, model id is opencode's `provider/model` path), `gemini` (HTTP, needs
+`GEMINI_API_KEY`). CLI transports run from a neutral cwd so no workspace instructions leak into the
+completion; they ignore `temperature`.
+
+Writes `results-<model>.json` (one per model); prints a per-task row + a summary (claims-passed % and
+tasks-solved %).
 
 ## Files
 
 | File | Owns |
 |---|---|
-| [tasks.json](tasks.json) | the pilot task set — NL prompt + fixed anchors + **ground-truth claims** (the spec) |
-| [model_client.py](model_client.py) | provider-agnostic completion; provider is data (`gemini` today), not a filename |
-| [prompts.py](prompts.py) | the three messages (task / blind-retry / checker-feedback) + the pose extractor |
-| [scoring.py](scoring.py) | build a scene from the model's poses, score it with the checker (shared by all arms) |
-| [arms.py](arms.py) | the three arms as a single loop parametrized by feedback on/off |
-| [run.py](run.py) | orchestrate arms × tasks, print the table, write `results.json` |
+| [tasks.json](tasks.json) · [tasks_hard.json](tasks_hard.json) | 3D pilot task sets — NL prompt + fixed anchors + **ground-truth claims** (the spec) |
+| [tasks_2d.json](tasks_2d.json) | the 2D suite (UI/floor-plan layouts, mostly dense L2/L3) — the only suite the raw-SVG arm runs on |
+| [model_client.py](model_client.py) | provider-agnostic completion; provider is data, one branch per transport |
+| [cli_transport.py](cli_transport.py) | the two local-CLI transports (`claude -p`, `opencode run`), neutral cwd, ANSI-stripped |
+| [prompts.py](prompts.py) | the message builders (task / SVG task / blind-retry / checker-feedback) + the pose extractor |
+| [scoring.py](scoring.py) | build a scene from the model's poses, score it with the checker (shared by all arms) + anchor alignment |
+| [arms.py](arms.py) | the four arms as a single loop parametrized by feedback on/off + extractor |
+| [run.py](run.py) | orchestrate arms × tasks, print the table, write `results-<model>.json` |
 
 ## Honesty notes
 
-- **Pilot model = Gemini** only because it is the key present in this environment. The planned slate
-  (Claude Haiku/Sonnet/Opus/Fable + opencode GLM/DeepSeek, ROADMAP M2) plugs in via one `model_client`
-  branch — provider is a string, nothing else changes.
-- **Tolerances are generous** (5 cm / 10°) so the signal is *getting the relation right*, not sub-mm
-  precision. Tightening them is a separate difficulty axis (the L3 levels in [tasks/](../tasks/)).
-- This is a **pilot**, not the M2 benchmark: hand-built tasks, one model, no format round-trip (glTF/SVG
-  emit is M2). It exists to see the WITH/WITHOUT signal early, on real model calls, scored by the real checker.
+- **Tolerances are generous** (5 cm / 10° in 3D, 3 cm in the 2D suite) so the signal is *getting the
+  relation right*, not sub-mm precision. Tightening them is a separate difficulty axis.
+- The 2D suite is weighted toward dense L2/L3 scenes on purpose: the earlier easy pilot showed a strong
+  model has no headroom on simple scenes at generous tolerance — the lift can only show where the
+  baseline breaks.
+- This is a **pilot**, not the M2 benchmark: hand-built tasks (8 per suite), no glTF round-trip yet. It
+  exists to see the WITH/WITHOUT signal early, on real model calls, scored by the real checker.
 
 <!-- routing:start -->
 ## Routing
@@ -53,9 +69,10 @@ Writes `results.json`; prints a per-task row + a summary (claims-passed % and ta
 | File | Interface | API | Description |
 |------|-----------|-----|-------------|
 | [`__init__.py`](__init__.py) | — | — | **facade** — bench facade: the pilot WITH/WITHOUT harness. Load tasks, run arms against a model, score via the checker. |
-| [`arms.py`](arms.py) | — | `ArmResult`, `run_without`, `run_blind`, `run_with` | The three experimental arms: WITHOUT (one-shot), blind-retry (control), WITH (checker feedback loop). |
+| [`arms.py`](arms.py) | — | `ArmResult`, `run_without`, `run_without_svg`, `run_blind`, `run_with` | The three experimental arms: WITHOUT (one-shot), blind-retry (control), WITH (checker feedback loop). |
+| [`cli_transport.py`](cli_transport.py) | — | `CliError`, `run_claude_cli`, `run_opencode` | Transports that shell out to local agent CLIs (claude -p, opencode run). Keeps model_client HTTP-only. |
 | [`model_client.py`](model_client.py) | [`model_client.pyi`](model_client.pyi) | `Model`, `ModelError`, `complete`, `label` | Provider-agnostic text-completion client. Provider is data (a string), never baked into a file/verb name. |
-| [`prompts.py`](prompts.py) | — | `build_task_prompt`, `build_blind_retry`, `build_feedback`, `extract_poses` | The three message builders (task prompt, blind-retry nudge, checker feedback) and the pose extractor. |
+| [`prompts.py`](prompts.py) | — | `build_task_prompt`, `build_svg_task_prompt`, `build_blind_retry`, `build_feedback`, `extract_poses` | The three message builders (task prompt, blind-retry nudge, checker feedback) and the pose extractor. |
 | [`run.py`](run.py) | — | `main` | Pilot runner: run WITHOUT / blind / WITH across the task set, print the results table, write results.json. |
-| [`scoring.py`](scoring.py) | — | `ScoreResult`, `build_document`, `score_poses`, `fraction` | Score a model's placement: build a texpace document from the task + the model's poses, then run the checker. |
+| [`scoring.py`](scoring.py) | — | `ScoreResult`, `build_document`, `align_to_anchors`, `score_poses`, `fraction` | Score a model's placement: build a texpace document from the task + the model's poses, then run the checker. |
 <!-- routing:end -->

@@ -11,6 +11,12 @@ FRAME_NOTE = (
     "Orientation is a unit quaternion [w,x,y,z]; use [1,0,0,0] for no rotation."
 )
 
+SVG_NOTE = (
+    "Convention: 1 SVG unit = 1 meter. Scene point (x, y) maps to SVG point (x, -y), because SVG y "
+    "grows downward — so 'above' in the scene means a smaller SVG y. "
+    "An object's position always refers to its CENTER."
+)
+
 
 def build_task_prompt(task: dict) -> str:
     """The shared first prompt. Asks for a JSON pose per placeable entity — the format both arms use."""
@@ -37,7 +43,33 @@ def build_task_prompt(task: dict) -> str:
     return result
 
 
-def build_blind_retry(previous: str) -> str:
+def build_svg_task_prompt(task: dict) -> str:
+    """The raw-format WITHOUT arm: the same task, but the model draws plain SVG — no DSL, no checker."""
+    place = task["place"]
+    movable = [_describe(e) for e in task["entities"] if e["name"] in place]
+    fixed = [_describe_fixed(e) for e in task["entities"] if e.get("fixed")]
+    lines = [
+        "You draw 2D layouts as SVG.",
+        SVG_NOTE,
+        "",
+        f"Task: {task['prompt']}",
+        "",
+        "Objects to draw: " + "; ".join(movable) + ".",
+    ]
+    if fixed:
+        one = "Already-fixed objects (draw each at exactly its given position): " + "; ".join(fixed) + "."
+        lines.append(one)
+    lines.append("")
+    lines.append(
+        'Each object is ONE element carrying id="<its name>": a box becomes <rect> (x,y = top-left '
+        "corner; width/height = its X/Y extent in meters), a sphere becomes <circle>. "
+        "Output ONLY the SVG markup. No prose, no markdown fences."
+    )
+    result = "\n".join(lines)
+    return result
+
+
+def build_blind_retry() -> str:
     """The control nudge: another attempt, but with NO checker information — isolates 'more tries'."""
     result = (
         "That placement did not fully satisfy the task. Try again. "

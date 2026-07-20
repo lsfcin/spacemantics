@@ -7,7 +7,7 @@ import json
 import time
 from pathlib import Path
 
-from .arms import ArmResult, run_blind, run_with, run_without
+from .arms import ArmResult, run_blind, run_with, run_without, run_without_svg
 from .model_client import Model
 
 HERE = Path(__file__).resolve().parent
@@ -33,23 +33,43 @@ def _run(model_spec: str, k: int, limit: int, tasks_file: str) -> int:
     tasks = suite["tasks"]
     if limit > 0:
         tasks = tasks[:limit]
-    rows = _run_all(tasks, header, model, k)
-    _print_table(rows, model, k)
-    _write(rows, model, k)
+    arms = _arm_names(header)
+    rows = _run_all(tasks, header, model, k, arms)
+    _print_table(rows, model, k, arms)
+    _write(rows, model, k, arms)
     return 0
 
 
-def _run_all(tasks: list, header: dict, model: Model, k: int) -> list:
+def _arm_names(header: dict) -> tuple:
+    """The raw-SVG arm only exists where SVG can carry the scene — the 2D profile (no z in a footprint)."""
+    if header.get("profile") == "2d":
+        result = ("svg", "without", "blind", "with")
+    else:
+        result = ("without", "blind", "with")
+    return result
+
+
+def _run_arm(name: str, task: dict, header: dict, model: Model, k: int) -> ArmResult:
+    if name == "svg":
+        result = run_without_svg(task, header, model)
+    elif name == "without":
+        result = run_without(task, header, model)
+    elif name == "blind":
+        result = run_blind(task, header, model, k)
+    else:
+        result = run_with(task, header, model, k)
+    return result
+
+
+def _run_all(tasks: list, header: dict, model: Model, k: int, arms: tuple) -> list:
     rows = []
     for task in tasks:
-        without = run_without(task, header, model)
-        _pause()
-        blind = run_blind(task, header, model, k)
-        _pause()
-        withfb = run_with(task, header, model, k)
-        _pause()
-        rows.append({"task": task["id"], "without": without, "blind": blind, "with": withfb})
-        _print_row(rows[-1])
+        row = {"task": task["id"]}
+        for name in arms:
+            row[name] = _run_arm(name, task, header, model, k)
+            _pause()
+        rows.append(row)
+        _print_row(row, arms)
     return rows
 
 
@@ -66,16 +86,17 @@ def _cell(result: ArmResult) -> str:
     return text
 
 
-def _print_row(row: dict) -> None:
-    line = f"{row['task']:<24} | WITHOUT {_cell(row['without'])} | BLIND {_cell(row['blind'])} | WITH {_cell(row['with'])}"
+def _print_row(row: dict, arms: tuple) -> None:
+    cells = [f"{name.upper()} {_cell(row[name])}" for name in arms]
+    line = f"{row['task']:<24} | " + " | ".join(cells)
     print(line)
 
 
-def _print_table(rows: list, model: Model, k: int) -> None:
+def _print_table(rows: list, model: Model, k: int, arms: tuple) -> None:
     print("")
     print(f"=== texpace pilot — model {model.label()}, k={k}, {len(rows)} tasks ===")
-    summary = _summary(rows)
-    for arm in ("without", "blind", "with"):
+    summary = _summary(rows, arms)
+    for arm in arms:
         stats = summary[arm]
         line = (
             f"{arm.upper():<8}: solved {stats['solved']}/{stats['n']}"
@@ -85,9 +106,9 @@ def _print_table(rows: list, model: Model, k: int) -> None:
         print(line)
 
 
-def _summary(rows: list) -> dict:
+def _summary(rows: list, arms: tuple) -> dict:
     summary = {}
-    for arm in ("without", "blind", "with"):
+    for arm in arms:
         summary[arm] = _arm_stats(rows, arm)
     return summary
 
@@ -106,21 +127,28 @@ def _arm_stats(rows: list, arm: str) -> dict:
     return stats
 
 
-def _write(rows: list, model: Model, k: int) -> None:
+def _write(rows: list, model: Model, k: int, arms: tuple) -> None:
     payload = {
         "model": model.label(), "k": k,
-        "summary": _summary(rows),
-        "rows": [_row_json(r) for r in rows],
+        "summary": _summary(rows, arms),
+        "rows": [_row_json(r, arms) for r in rows],
     }
     text = json.dumps(payload, indent=2)
-    path = HERE / "results.json"
+    path = HERE / f"results-{_slug(model)}.json"
     path.write_text(text, encoding="utf-8")
     print(f"\nwrote {path}")
 
 
-def _row_json(row: dict) -> dict:
+def _slug(model: Model) -> str:
+    label = model.label()
+    flat = label.replace(":", "-")
+    result = flat.replace("/", "-")
+    return result
+
+
+def _row_json(row: dict, arms: tuple) -> dict:
     result = {"task": row["task"]}
-    for arm in ("without", "blind", "with"):
+    for arm in arms:
         item = row[arm]
         result[arm] = {
             "solved": item.solved, "passed": item.passed,

@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from adapters import parse_poses
+
 from .model_client import Model, ModelError, complete
-from .prompts import build_blind_retry, build_feedback, build_task_prompt, extract_poses
-from .scoring import ScoreResult, score_poses
+from .prompts import build_blind_retry, build_feedback, build_svg_task_prompt, build_task_prompt, extract_poses
+from .scoring import ScoreResult, align_to_anchors, score_poses
 
 
 @dataclass
@@ -25,6 +27,21 @@ def run_without(task: dict, header: dict, model: Model) -> ArmResult:
     return result
 
 
+def run_without_svg(task: dict, header: dict, model: Model) -> ArmResult:
+    """WITHOUT texpace, raw-format edition: one shot of plain SVG, parsed back for scoring. 2D tasks only.
+    Parsed poses are anchor-aligned first: the arm is scored on relations, not on its choice of origin."""
+    prompt = build_svg_task_prompt(task)
+
+    def extract(text: str) -> dict:
+        poses = parse_poses(text)
+        result = align_to_anchors(task, poses)
+        return result
+
+    outcome = _attempt(task, header, model, prompt, extract)
+    result = _merge(task, outcome, 1)
+    return result
+
+
 def run_blind(task: dict, header: dict, model: Model, k: int) -> ArmResult:
     """Control: k attempts, retried with NO checker information. Isolates 'more tries' from feedback."""
     result = _loop(task, header, model, k, feedback=False)
@@ -38,7 +55,8 @@ def run_with(task: dict, header: dict, model: Model, k: int) -> ArmResult:
 
 
 def _loop(task: dict, header: dict, model: Model, k: int, feedback: bool) -> ArmResult:
-    prompt = build_task_prompt(task)
+    base = build_task_prompt(task)
+    prompt = base
     total = len(task["claims"])
     last = ArmResult(task["id"], solved=False, passed=0, scored=total, attempts=0, error="no attempt")
     for attempt in range(k):
@@ -46,15 +64,17 @@ def _loop(task: dict, header: dict, model: Model, k: int, feedback: bool) -> Arm
         last = _merge(task, outcome, attempt + 1)
         if outcome.solved:
             break
-        prompt = _next_prompt(task, outcome, feedback)
+        prompt = _next_prompt(base, outcome, feedback)
     return last
 
 
-def _next_prompt(task: dict, outcome: "_Attempt", feedback: bool) -> str:
+def _next_prompt(base: str, outcome: "_Attempt", feedback: bool) -> str:
+    """`complete` is single-turn, so every retry re-carries the full task + the previous answer."""
     if feedback and outcome.report is not None:
-        result = build_feedback(outcome.report)
+        nudge = build_feedback(outcome.report)
     else:
-        result = build_blind_retry("")
+        nudge = build_blind_retry()
+    result = f"{base}\n\nYour previous answer:\n{outcome.text}\n\n{nudge}"
     return result
 
 
@@ -64,16 +84,18 @@ class _Attempt:
     score: ScoreResult | None
     report: object
     error: str
+    text: str = ""
 
 
-def _attempt(task: dict, header: dict, model: Model, prompt: str) -> _Attempt:
+def _attempt(task: dict, header: dict, model: Model, prompt: str, extract=extract_poses) -> _Attempt:
+    text = ""
     try:
         text = complete(model, prompt)
-        poses = extract_poses(text)
+        poses = extract(text)
     except (ModelError, ValueError) as failure:
-        return _Attempt(False, None, None, str(failure)[:120])
+        return _Attempt(False, None, None, str(failure)[:120], text)
     score = score_poses(task, header, poses)
-    result = _Attempt(score.solved, score, score.report, "")
+    result = _Attempt(score.solved, score, score.report, "", text)
     return result
 
 

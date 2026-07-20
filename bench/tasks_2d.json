@@ -1,0 +1,189 @@
+{
+  "header": {
+    "profile": "2d",
+    "timebase": "seconds",
+    "tolerance": { "length": "3cm", "angle": "10deg", "time": "1ms" }
+  },
+  "tasks": [
+    {
+      "id": "u01_title_above_button",
+      "level": "L1",
+      "prompt": "A card is fixed at the origin, 4 (X) by 3 (Y) meters. Place a title (3.6 by 0.5) and a button (1.2 by 0.5) fully inside the card, with the title above the button and not touching it.",
+      "entities": [
+        { "name": "card", "type": "panel", "shape": { "kind": "box", "extent": [4, 3, 0.01] }, "fixed": true, "position": [0, 0, 0] },
+        { "name": "title", "type": "widget", "shape": { "kind": "box", "extent": [3.6, 0.5, 0.01] } },
+        { "name": "button", "type": "widget", "shape": { "kind": "box", "extent": [1.2, 0.5, 0.01] } }
+      ],
+      "place": ["title", "button"],
+      "claims": [
+        { "pred": "TOP", "a": "title", "b": "card", "rcc": ["TPP", "NTPP"], "text": "the title is inside the card" },
+        { "pred": "TOP", "a": "button", "b": "card", "rcc": ["TPP", "NTPP"], "text": "the button is inside the card" },
+        { "pred": "DIR", "fig": "title", "gnd": "button", "term": "above", "anchor": { "kind": "world" }, "text": "the title is above the button" },
+        { "pred": "TOP", "a": "title", "b": "button", "rcc": ["DC"], "text": "the title does not touch the button" }
+      ]
+    },
+    {
+      "id": "u02_dot_beside_label",
+      "level": "L1",
+      "prompt": "A label is fixed at the origin, 2 (X) by 0.5 (Y) meters. Place a dot (a sphere of radius 0.2) to the east of the label, clear of it, with its center within 1 meter of the label.",
+      "entities": [
+        { "name": "label", "type": "widget", "shape": { "kind": "box", "extent": [2, 0.5, 0.01] }, "fixed": true, "position": [0, 0, 0] },
+        { "name": "dot", "type": "icon", "shape": { "kind": "sphere", "radius": 0.2 } }
+      ],
+      "place": ["dot"],
+      "claims": [
+        { "pred": "DIR", "fig": "dot", "gnd": "label", "term": "east", "anchor": { "kind": "world" }, "text": "the dot is east of the label" },
+        { "pred": "TOP", "a": "dot", "b": "label", "rcc": ["DC"], "text": "the dot is clear of the label" },
+        { "pred": "DIST", "fig": "dot", "gnd": "label", "op": "<", "q": { "value": 1.0, "unit": "m" }, "text": "the dot stays within 1 m of the label" }
+      ]
+    },
+    {
+      "id": "u03_toolbar_row",
+      "level": "L2",
+      "prompt": "A toolbar is fixed at the origin, 6 (X) by 0.8 (Y) meters. Place four icons (each 0.6 by 0.6), all fully inside the toolbar, in west-to-east order: icon_a, then icon_b, then icon_c, then icon_d. No two icons may overlap.",
+      "entities": [
+        { "name": "toolbar", "type": "panel", "shape": { "kind": "box", "extent": [6, 0.8, 0.01] }, "fixed": true, "position": [0, 0, 0] },
+        { "name": "icon_a", "type": "icon", "shape": { "kind": "box", "extent": [0.6, 0.6, 0.01] } },
+        { "name": "icon_b", "type": "icon", "shape": { "kind": "box", "extent": [0.6, 0.6, 0.01] } },
+        { "name": "icon_c", "type": "icon", "shape": { "kind": "box", "extent": [0.6, 0.6, 0.01] } },
+        { "name": "icon_d", "type": "icon", "shape": { "kind": "box", "extent": [0.6, 0.6, 0.01] } }
+      ],
+      "place": ["icon_a", "icon_b", "icon_c", "icon_d"],
+      "claims": [
+        { "pred": "TOP", "a": "icon_a", "b": "toolbar", "rcc": ["TPP", "NTPP"], "text": "icon_a is inside the toolbar" },
+        { "pred": "TOP", "a": "icon_b", "b": "toolbar", "rcc": ["TPP", "NTPP"], "text": "icon_b is inside the toolbar" },
+        { "pred": "TOP", "a": "icon_c", "b": "toolbar", "rcc": ["TPP", "NTPP"], "text": "icon_c is inside the toolbar" },
+        { "pred": "TOP", "a": "icon_d", "b": "toolbar", "rcc": ["TPP", "NTPP"], "text": "icon_d is inside the toolbar" },
+        { "pred": "DIR", "fig": "icon_b", "gnd": "icon_a", "term": "east", "anchor": { "kind": "world" }, "text": "icon_b is east of icon_a" },
+        { "pred": "DIR", "fig": "icon_c", "gnd": "icon_b", "term": "east", "anchor": { "kind": "world" }, "text": "icon_c is east of icon_b" },
+        { "pred": "DIR", "fig": "icon_d", "gnd": "icon_c", "term": "east", "anchor": { "kind": "world" }, "text": "icon_d is east of icon_c" },
+        { "quant": "none", "over": { "pairs": { "type": "icon" } }, "pred": { "pred": "TOP", "rcc": ["PO", "EQ", "TPP", "TPPi", "NTPP", "NTPPi"] }, "text": "no two icons overlap" }
+      ]
+    },
+    {
+      "id": "u04_login_form",
+      "level": "L2",
+      "prompt": "A panel is fixed at the origin, 3 (X) by 4.5 (Y) meters. Place a logo (1 by 1), a username field (2.4 by 0.5), a password field (2.4 by 0.5) and a submit button (1.2 by 0.6), all fully inside the panel, stacked top to bottom in that order. No two widgets may overlap.",
+      "entities": [
+        { "name": "panel", "type": "panel", "shape": { "kind": "box", "extent": [3, 4.5, 0.01] }, "fixed": true, "position": [0, 0, 0] },
+        { "name": "logo", "type": "widget", "shape": { "kind": "box", "extent": [1, 1, 0.01] } },
+        { "name": "username", "type": "widget", "shape": { "kind": "box", "extent": [2.4, 0.5, 0.01] } },
+        { "name": "password", "type": "widget", "shape": { "kind": "box", "extent": [2.4, 0.5, 0.01] } },
+        { "name": "submit", "type": "widget", "shape": { "kind": "box", "extent": [1.2, 0.6, 0.01] } }
+      ],
+      "place": ["logo", "username", "password", "submit"],
+      "claims": [
+        { "pred": "TOP", "a": "logo", "b": "panel", "rcc": ["TPP", "NTPP"], "text": "the logo is inside the panel" },
+        { "pred": "TOP", "a": "username", "b": "panel", "rcc": ["TPP", "NTPP"], "text": "the username field is inside the panel" },
+        { "pred": "TOP", "a": "password", "b": "panel", "rcc": ["TPP", "NTPP"], "text": "the password field is inside the panel" },
+        { "pred": "TOP", "a": "submit", "b": "panel", "rcc": ["TPP", "NTPP"], "text": "the submit button is inside the panel" },
+        { "pred": "DIR", "fig": "logo", "gnd": "username", "term": "above", "anchor": { "kind": "world" }, "text": "the logo is above the username field" },
+        { "pred": "DIR", "fig": "username", "gnd": "password", "term": "above", "anchor": { "kind": "world" }, "text": "the username field is above the password field" },
+        { "pred": "DIR", "fig": "password", "gnd": "submit", "term": "above", "anchor": { "kind": "world" }, "text": "the password field is above the submit button" },
+        { "quant": "none", "over": { "pairs": { "type": "widget" } }, "pred": { "pred": "TOP", "rcc": ["PO", "EQ", "TPP", "TPPi", "NTPP", "NTPPi"] }, "text": "no two widgets overlap" }
+      ]
+    },
+    {
+      "id": "u05_bedroom_plan",
+      "level": "L3",
+      "prompt": "A room is fixed at the origin, 8 (X) by 6 (Y) meters. Place a bed (2 by 1.6), a wardrobe (1.8 by 0.6), a desk (1.4 by 0.7), a chair (0.5 by 0.5) and a rug (2.4 by 1.8), all fully inside the room. The wardrobe must not touch the bed. The desk is east of the bed, with the chair's center within 0.8 meters of the desk. The rug partially overlaps the bed (it sticks out from under it). No two furniture pieces overlap.",
+      "entities": [
+        { "name": "room", "type": "panel", "shape": { "kind": "box", "extent": [8, 6, 0.01] }, "fixed": true, "position": [0, 0, 0] },
+        { "name": "bed", "type": "furniture", "shape": { "kind": "box", "extent": [2, 1.6, 0.01] } },
+        { "name": "wardrobe", "type": "furniture", "shape": { "kind": "box", "extent": [1.8, 0.6, 0.01] } },
+        { "name": "desk", "type": "furniture", "shape": { "kind": "box", "extent": [1.4, 0.7, 0.01] } },
+        { "name": "chair", "type": "furniture", "shape": { "kind": "box", "extent": [0.5, 0.5, 0.01] } },
+        { "name": "rug", "type": "textile", "shape": { "kind": "box", "extent": [2.4, 1.8, 0.01] } }
+      ],
+      "place": ["bed", "wardrobe", "desk", "chair", "rug"],
+      "claims": [
+        { "pred": "TOP", "a": "bed", "b": "room", "rcc": ["TPP", "NTPP"], "text": "the bed is inside the room" },
+        { "pred": "TOP", "a": "wardrobe", "b": "room", "rcc": ["TPP", "NTPP"], "text": "the wardrobe is inside the room" },
+        { "pred": "TOP", "a": "desk", "b": "room", "rcc": ["TPP", "NTPP"], "text": "the desk is inside the room" },
+        { "pred": "TOP", "a": "chair", "b": "room", "rcc": ["TPP", "NTPP"], "text": "the chair is inside the room" },
+        { "pred": "TOP", "a": "rug", "b": "room", "rcc": ["TPP", "NTPP"], "text": "the rug is inside the room" },
+        { "pred": "TOP", "a": "wardrobe", "b": "bed", "rcc": ["DC"], "text": "the wardrobe does not touch the bed" },
+        { "pred": "DIR", "fig": "desk", "gnd": "bed", "term": "east", "anchor": { "kind": "world" }, "text": "the desk is east of the bed" },
+        { "pred": "DIST", "fig": "chair", "gnd": "desk", "op": "<", "q": { "value": 0.8, "unit": "m" }, "text": "the chair stays within 0.8 m of the desk" },
+        { "pred": "TOP", "a": "rug", "b": "bed", "rcc": ["PO"], "text": "the rug partially overlaps the bed" },
+        { "quant": "none", "over": { "pairs": { "type": "furniture" } }, "pred": { "pred": "TOP", "rcc": ["PO", "EQ", "TPP", "TPPi", "NTPP", "NTPPi"] }, "text": "no two furniture pieces overlap" }
+      ]
+    },
+    {
+      "id": "u06_plaza_cross",
+      "level": "L3",
+      "prompt": "A plaza is fixed at the origin, 10 (X) by 10 (Y) meters. Place five kiosks (each 1 by 1) in a cross: kiosk_c near the middle, kiosk_e east of kiosk_c, kiosk_w west of kiosk_c, kiosk_n above (north of) kiosk_c, kiosk_s below (south of) kiosk_c. All kiosks fully inside the plaza, no two kiosks overlapping, and the centers of kiosk_e and kiosk_w each more than 2 meters from kiosk_c.",
+      "entities": [
+        { "name": "plaza", "type": "panel", "shape": { "kind": "box", "extent": [10, 10, 0.01] }, "fixed": true, "position": [0, 0, 0] },
+        { "name": "kiosk_c", "type": "kiosk", "shape": { "kind": "box", "extent": [1, 1, 0.01] } },
+        { "name": "kiosk_e", "type": "kiosk", "shape": { "kind": "box", "extent": [1, 1, 0.01] } },
+        { "name": "kiosk_w", "type": "kiosk", "shape": { "kind": "box", "extent": [1, 1, 0.01] } },
+        { "name": "kiosk_n", "type": "kiosk", "shape": { "kind": "box", "extent": [1, 1, 0.01] } },
+        { "name": "kiosk_s", "type": "kiosk", "shape": { "kind": "box", "extent": [1, 1, 0.01] } }
+      ],
+      "place": ["kiosk_c", "kiosk_e", "kiosk_w", "kiosk_n", "kiosk_s"],
+      "claims": [
+        { "pred": "TOP", "a": "kiosk_c", "b": "plaza", "rcc": ["TPP", "NTPP"], "text": "kiosk_c is inside the plaza" },
+        { "pred": "TOP", "a": "kiosk_e", "b": "plaza", "rcc": ["TPP", "NTPP"], "text": "kiosk_e is inside the plaza" },
+        { "pred": "TOP", "a": "kiosk_w", "b": "plaza", "rcc": ["TPP", "NTPP"], "text": "kiosk_w is inside the plaza" },
+        { "pred": "TOP", "a": "kiosk_n", "b": "plaza", "rcc": ["TPP", "NTPP"], "text": "kiosk_n is inside the plaza" },
+        { "pred": "TOP", "a": "kiosk_s", "b": "plaza", "rcc": ["TPP", "NTPP"], "text": "kiosk_s is inside the plaza" },
+        { "pred": "DIR", "fig": "kiosk_e", "gnd": "kiosk_c", "term": "east", "anchor": { "kind": "world" }, "text": "kiosk_e is east of kiosk_c" },
+        { "pred": "DIR", "fig": "kiosk_w", "gnd": "kiosk_c", "term": "west", "anchor": { "kind": "world" }, "text": "kiosk_w is west of kiosk_c" },
+        { "pred": "DIR", "fig": "kiosk_n", "gnd": "kiosk_c", "term": "above", "anchor": { "kind": "world" }, "text": "kiosk_n is north of kiosk_c" },
+        { "pred": "DIR", "fig": "kiosk_s", "gnd": "kiosk_c", "term": "below", "anchor": { "kind": "world" }, "text": "kiosk_s is south of kiosk_c" },
+        { "pred": "DIST", "fig": "kiosk_e", "gnd": "kiosk_c", "op": ">", "q": { "value": 2.0, "unit": "m" }, "text": "kiosk_e's center is more than 2 m from kiosk_c" },
+        { "pred": "DIST", "fig": "kiosk_w", "gnd": "kiosk_c", "op": ">", "q": { "value": 2.0, "unit": "m" }, "text": "kiosk_w's center is more than 2 m from kiosk_c" },
+        { "quant": "none", "over": { "pairs": { "type": "kiosk" } }, "pred": { "pred": "TOP", "rcc": ["PO", "EQ", "TPP", "TPPi", "NTPP", "NTPPi"] }, "text": "no two kiosks overlap" }
+      ]
+    },
+    {
+      "id": "u07_nested_cards",
+      "level": "L3",
+      "prompt": "A window is fixed at the origin, 6 (X) by 4 (Y) meters. Place a panel (2.6 by 3) fully inside the window; two cards (each 2 by 1) fully inside the panel, card_a above card_b and not touching it; and a badge (a sphere of radius 0.15) fully inside card_a.",
+      "entities": [
+        { "name": "window", "type": "panel", "shape": { "kind": "box", "extent": [6, 4, 0.01] }, "fixed": true, "position": [0, 0, 0] },
+        { "name": "panel", "type": "panel", "shape": { "kind": "box", "extent": [2.6, 3, 0.01] } },
+        { "name": "card_a", "type": "widget", "shape": { "kind": "box", "extent": [2, 1, 0.01] } },
+        { "name": "card_b", "type": "widget", "shape": { "kind": "box", "extent": [2, 1, 0.01] } },
+        { "name": "badge", "type": "icon", "shape": { "kind": "sphere", "radius": 0.15 } }
+      ],
+      "place": ["panel", "card_a", "card_b", "badge"],
+      "claims": [
+        { "pred": "TOP", "a": "panel", "b": "window", "rcc": ["TPP", "NTPP"], "text": "the panel is inside the window" },
+        { "pred": "TOP", "a": "card_a", "b": "panel", "rcc": ["TPP", "NTPP"], "text": "card_a is inside the panel" },
+        { "pred": "TOP", "a": "card_b", "b": "panel", "rcc": ["TPP", "NTPP"], "text": "card_b is inside the panel" },
+        { "pred": "TOP", "a": "badge", "b": "card_a", "rcc": ["TPP", "NTPP"], "text": "the badge is inside card_a" },
+        { "pred": "DIR", "fig": "card_a", "gnd": "card_b", "term": "above", "anchor": { "kind": "world" }, "text": "card_a is above card_b" },
+        { "pred": "TOP", "a": "card_a", "b": "card_b", "rcc": ["DC"], "text": "card_a does not touch card_b" }
+      ]
+    },
+    {
+      "id": "u08_seating_chart",
+      "level": "L3",
+      "prompt": "A hall is fixed at the origin, 12 (X) by 8 (Y) meters, with a stage (10 by 1.5) fixed at position [0, 3]. Place six tables (each 1.2 by 1.2) fully inside the hall, every table south of (below) the stage and clear of it, arranged in two west-to-east rows of three: front row table_a1, table_a2, table_a3; back row table_b1, table_b2, table_b3, with the back row south of the front row. No two tables overlap.",
+      "entities": [
+        { "name": "hall", "type": "panel", "shape": { "kind": "box", "extent": [12, 8, 0.01] }, "fixed": true, "position": [0, 0, 0] },
+        { "name": "stage", "type": "panel", "shape": { "kind": "box", "extent": [10, 1.5, 0.01] }, "fixed": true, "position": [0, 3, 0] },
+        { "name": "table_a1", "type": "table", "shape": { "kind": "box", "extent": [1.2, 1.2, 0.01] } },
+        { "name": "table_a2", "type": "table", "shape": { "kind": "box", "extent": [1.2, 1.2, 0.01] } },
+        { "name": "table_a3", "type": "table", "shape": { "kind": "box", "extent": [1.2, 1.2, 0.01] } },
+        { "name": "table_b1", "type": "table", "shape": { "kind": "box", "extent": [1.2, 1.2, 0.01] } },
+        { "name": "table_b2", "type": "table", "shape": { "kind": "box", "extent": [1.2, 1.2, 0.01] } },
+        { "name": "table_b3", "type": "table", "shape": { "kind": "box", "extent": [1.2, 1.2, 0.01] } }
+      ],
+      "place": ["table_a1", "table_a2", "table_a3", "table_b1", "table_b2", "table_b3"],
+      "claims": [
+        { "quant": "every", "over": { "set": { "type": "table" }, "as": "a" }, "pred": { "pred": "TOP", "b": "hall", "rcc": ["TPP", "NTPP"] }, "text": "every table is inside the hall" },
+        { "quant": "every", "over": { "set": { "type": "table" }, "as": "a" }, "pred": { "pred": "TOP", "b": "stage", "rcc": ["DC"] }, "text": "every table is clear of the stage" },
+        { "quant": "every", "over": { "set": { "type": "table" }, "as": "fig" }, "pred": { "pred": "DIR", "gnd": "stage", "term": "below", "anchor": { "kind": "world" } }, "text": "every table is south of the stage" },
+        { "pred": "DIR", "fig": "table_a2", "gnd": "table_a1", "term": "east", "anchor": { "kind": "world" }, "text": "table_a2 is east of table_a1" },
+        { "pred": "DIR", "fig": "table_a3", "gnd": "table_a2", "term": "east", "anchor": { "kind": "world" }, "text": "table_a3 is east of table_a2" },
+        { "pred": "DIR", "fig": "table_b2", "gnd": "table_b1", "term": "east", "anchor": { "kind": "world" }, "text": "table_b2 is east of table_b1" },
+        { "pred": "DIR", "fig": "table_b3", "gnd": "table_b2", "term": "east", "anchor": { "kind": "world" }, "text": "table_b3 is east of table_b2" },
+        { "pred": "DIR", "fig": "table_b1", "gnd": "table_a1", "term": "below", "anchor": { "kind": "world" }, "text": "the back row is south of the front row" },
+        { "quant": "none", "over": { "pairs": { "type": "table" } }, "pred": { "pred": "TOP", "rcc": ["PO", "EQ", "TPP", "TPPi", "NTPP", "NTPPi"] }, "text": "no two tables overlap" }
+      ]
+    }
+  ]
+}

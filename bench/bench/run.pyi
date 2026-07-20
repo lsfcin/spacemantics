@@ -1,4 +1,4 @@
-from .arms import ArmResult as ArmResult, run_blind as run_blind, run_with as run_with, run_without as run_without
+from .arms import ArmResult as ArmResult, run_blind as run_blind, run_with as run_with, run_without as run_without, run_without_svg as run_without_svg
 from .model_client import Model as Model
 from _typeshed import Incomplete
 

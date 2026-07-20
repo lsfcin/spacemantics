@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .arms import ArmResult, run_blind, run_with, run_without
+from .arms import ArmResult, run_blind, run_with, run_without, run_without_svg
 from .model_client import Model, ModelError, complete
 from .scoring import ScoreResult, score_poses
 
@@ -15,5 +15,6 @@ __all__ = [
     "run_blind",
     "run_with",
     "run_without",
+    "run_without_svg",
     "score_poses",
 ]

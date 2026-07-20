@@ -2,6 +2,7 @@ from _typeshed import Incomplete
 from checker import FAIL as FAIL
 
 PAD: int
+TOP: int
 PANEL_W: int
 MAX_SCALE: float
 PASS_FILL: Incomplete

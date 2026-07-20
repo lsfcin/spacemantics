@@ -24,24 +24,28 @@ WITH/WITHOUT visual).
 
 | File | Owns |
 |---|---|
-| [svg.py](svg.py) | scene → SVG: 2D projection, footprints, verdict colouring + panel |
+| [svg.py](svg.py) | scene → SVG: 2D projection, footprints, verdict colouring + panel; invertible (`id` per shape + `data-*` frame metadata) |
+| [svg_parse.py](svg_parse.py) | SVG → poses: the round-trip. Emitter output inverted exactly; model-emitted SVG read under the metre contract (1 unit = 1 m, y flipped) |
 | [__main__.py](__main__.py) | `python -m adapters <scene.json>` |
+
+`parse_poses(text)` tolerates prose/fences around the SVG and returns `{name: {position, orientation}}`
+for every `<rect>`/`<circle>` carrying an `id`. This is what lets the bench's raw-SVG arm be scored by
+the checker (see [bench/CONTEXT.md](../bench/CONTEXT.md)).
 
 ## Honest scope
 
 - **2D top-down only** today. A 3D scene is projected to its XY footprints — fine for planar layouts (UI,
   floor plans, iso maps); a real 3D view (isometric / glTF) is later work.
-- **Emit only.** The round-trip parser (SVG → scene, needed to *score* a model's raw-SVG output in the
-  WITHOUT arm) is the next piece — see [bench/CONTEXT.md](../bench/CONTEXT.md).
-- The full model-driven WITH/WITHOUT (a model emitting raw SVG vs emitting texpace + checker feedback)
-  needs an on-slate model; the render + score pipeline is what makes its two outputs comparable.
+- The parser reads **positions, not sizes**: scoring takes shapes from the task spec. A full SVG→scene
+  round-trip that also recovers extents (the cross-format consistency test) is still owed.
 
 <!-- routing:start -->
 ## Routing
 
 | File | Interface | API | Description |
 |------|-----------|-----|-------------|
-| [`__init__.py`](__init__.py) | — | — | **facade** — adapters facade: render a texpace scene to a viewable open format. SVG first (2D, needs no engine). |
+| [`__init__.py`](__init__.py) | — | — | **facade** — adapters facade: render a texpace scene to a viewable open format, and parse one back for scoring. |
 | [`__main__.py`](__main__.py) | — | `main` | CLI: `python -m adapters <scene.json>` -> an SVG (footprints + checker verdicts) on stdout. |
 | [`svg.py`](svg.py) | — | `render_document`, `render_pair` | texpace scene -> SVG. Top-down footprints (x,y) with the checker's verdicts drawn on: red = a claim this object breaks. |
+| [`svg_parse.py`](svg_parse.py) | — | `parse_poses`, `invert` | SVG -> poses: read per-object placements back out of an SVG so the checker can score raw-SVG output. |
 <!-- routing:end -->

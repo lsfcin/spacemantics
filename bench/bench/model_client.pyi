@@ -1,3 +1,4 @@
+from .cli_transport import CliError as CliError, run_claude_cli as run_claude_cli, run_opencode as run_opencode
 from dataclasses import dataclass
 
 TIMEOUT_S: int

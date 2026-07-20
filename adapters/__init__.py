@@ -1,7 +1,8 @@
-# adapters facade: render a texpace scene to a viewable open format. SVG first (2D, needs no engine).
+# adapters facade: render a texpace scene to a viewable open format, and parse one back for scoring.
 
 from __future__ import annotations
 
 from .svg import render_document, render_pair
+from .svg_parse import parse_poses
 
-__all__ = ["render_document", "render_pair"]
+__all__ = ["parse_poses", "render_document", "render_pair"]
