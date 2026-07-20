@@ -1,7 +1,9 @@
 from _typeshed import Incomplete
 
 CLI_TIMEOUT_S: int
+CLI_RETRIES: int
 ANSI_PATTERN: Incomplete
+OPENCODE_AGENT: str
 
 class CliError(Exception): ...
 

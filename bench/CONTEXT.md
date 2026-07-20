@@ -73,6 +73,7 @@ tasks-solved %).
 | [`cli_transport.py`](cli_transport.py) | — | `CliError`, `run_claude_cli`, `run_opencode` | Transports that shell out to local agent CLIs (claude -p, opencode run). Keeps model_client HTTP-only. |
 | [`model_client.py`](model_client.py) | [`model_client.pyi`](model_client.pyi) | `Model`, `ModelError`, `complete`, `label` | Provider-agnostic text-completion client. Provider is data (a string), never baked into a file/verb name. |
 | [`prompts.py`](prompts.py) | — | `build_task_prompt`, `build_svg_task_prompt`, `build_blind_retry`, `build_feedback`, `extract_poses` | The three message builders (task prompt, blind-retry nudge, checker feedback) and the pose extractor. |
+| [`report.py`](report.py) | — | `main` | Aggregate results-<model>.json files into one cross-model table, with the honest lift (WITH - blind). |
 | [`run.py`](run.py) | — | `main` | Pilot runner: run WITHOUT / blind / WITH across the task set, print the results table, write results.json. |
 | [`scoring.py`](scoring.py) | — | `ScoreResult`, `build_document`, `align_to_anchors`, `score_poses`, `fraction` | Score a model's placement: build a texpace document from the task + the model's poses, then run the checker. |
 <!-- routing:end -->
