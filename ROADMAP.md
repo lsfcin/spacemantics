@@ -51,15 +51,20 @@ rule (rotation = cell remap, never mirror); six coord systems (`src/transform/co
 ### Problem
 Produce the evidence: does texpace + checker lift LLM spatial capability, across dimensions and models?
 
-### Unblock first — the pilot is built, the model is missing
-The `bench/` harness (WITHOUT / blind / WITH arms, checker-scored) and the `adapters/` SVG render exist.
-The pilot ran only on Gemini (off-slate, quota-limited). To get a real number:
-- [x] **Wire the real model slate** into `bench/model_client.py` — done via two local-CLI transports
-      (`cli_transport.py`): `claude-cli` (subscription `claude -p`; haiku/sonnet/opus/fable ids) and
-      `opencode` (`opencode run`; working ids: `nvidia/z-ai/glm-5.2`, `nvidia/deepseek-ai/deepseek-v4-flash`;
-      `deepseek-v4-pro` times out, Alibaba token expired, ollama-cloud needs a subscription).
-- [x] **SVG → scene parser** (`adapters/svg_parse.py`) — scores the raw-SVG arm; parsed poses are
-      anchor-aligned before scoring (relations, not origin choice). 2D suite: `bench/tasks_2d.json`.
+### Unblock first — model slate + SVG scoring done (see HISTORY.md); one lane still owed
+The `bench/` harness (SVG / WITHOUT / blind / WITH arms, checker-scored), the real model slate
+(`claude-cli` + `opencode` transports), and the SVG round-trip all exist and ran for real — see
+HISTORY.md 2026-07-20 for the full account. Remaining:
+- [ ] **Re-run the opencode lane** (GLM 5.2, DeepSeek v4 flash) on `tasks_2d.json` with the hardened
+      transport (`bench/cli_transport.py`, `plan` agent + retry, commit 458e8a9). It died silently
+      mid-run in the background-task environment last session — cause not diagnosed (no error, no
+      partial output); prefer running it in the foreground / watched rather than backgrounded. A
+      **pre-hardening** run showed real WITH-blind lift on both (GLM +15.0pp, DeepSeek +11.7pp) but
+      is not trustworthy (ran under the agentic-write bug) — do not cite those numbers, re-run instead.
+- [ ] **`tasks_2d.json` is saturated for the Anthropic slate** (Haiku + Sonnet both solve it ~100% in
+      every arm, no lift). Either it's the wrong instrument for strong models (need a harder tier) or
+      weaker models (GLM/DeepSeek) are where this suite's signal actually lives — the re-run above
+      will tell us which. Don't add "make it harder" work until that's known.
 - [ ] **3D / isometric render** in `adapters/` — currently 2D top-down footprints only.
 
 ### Then the full design

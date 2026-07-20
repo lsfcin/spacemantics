@@ -35,7 +35,12 @@ python -m bench.run --limit 2 --k 3                     # smoke test
 Providers: `claude-cli` (local `claude -p`, any alias/model id it accepts: haiku, sonnet, opus, …),
 `opencode` (local `opencode run`, model id is opencode's `provider/model` path), `gemini` (HTTP, needs
 `GEMINI_API_KEY`). CLI transports run from a neutral cwd so no workspace instructions leak into the
-completion; they ignore `temperature`.
+completion; they ignore `temperature`. Both retry on a transient failure (`CLI_RETRIES`, backoff).
+
+**opencode always runs under the `plan` agent** (`cli_transport.OPENCODE_AGENT`), never the default
+`build` agent — `build` has blanket `*` tool permissions and *will* invoke Write/Bash mid-completion
+instead of just replying with text (observed: it wrote stray `.svg` files into the repo root). Do not
+drop this pin without re-verifying no tool use survives a completion.
 
 Writes `results-<model>.json` (one per model); prints a per-task row + a summary (claims-passed % and
 tasks-solved %).

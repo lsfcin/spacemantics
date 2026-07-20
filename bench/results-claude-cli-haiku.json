@@ -1,0 +1,288 @@
+{
+  "model": "claude-cli:haiku",
+  "k": 3,
+  "summary": {
+    "svg": {
+      "n": 8,
+      "solved": 8,
+      "passed": 60,
+      "scored": 60,
+      "claim_pct": 100.0,
+      "solve_pct": 100.0
+    },
+    "without": {
+      "n": 8,
+      "solved": 8,
+      "passed": 60,
+      "scored": 60,
+      "claim_pct": 100.0,
+      "solve_pct": 100.0
+    },
+    "blind": {
+      "n": 8,
+      "solved": 7,
+      "passed": 58,
+      "scored": 60,
+      "claim_pct": 96.66666666666667,
+      "solve_pct": 87.5
+    },
+    "with": {
+      "n": 8,
+      "solved": 8,
+      "passed": 60,
+      "scored": 60,
+      "claim_pct": 100.0,
+      "solve_pct": 100.0
+    }
+  },
+  "rows": [
+    {
+      "task": "u01_title_above_button",
+      "svg": {
+        "solved": true,
+        "passed": 4,
+        "scored": 4,
+        "attempts": 1,
+        "error": ""
+      },
+      "without": {
+        "solved": true,
+        "passed": 4,
+        "scored": 4,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 4,
+        "scored": 4,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 4,
+        "scored": 4,
+        "attempts": 1,
+        "error": ""
+      }
+    },
+    {
+      "task": "u02_dot_beside_label",
+      "svg": {
+        "solved": true,
+        "passed": 3,
+        "scored": 3,
+        "attempts": 1,
+        "error": ""
+      },
+      "without": {
+        "solved": true,
+        "passed": 3,
+        "scored": 3,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": false,
+        "passed": 1,
+        "scored": 3,
+        "attempts": 3,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 3,
+        "scored": 3,
+        "attempts": 2,
+        "error": ""
+      }
+    },
+    {
+      "task": "u03_toolbar_row",
+      "svg": {
+        "solved": true,
+        "passed": 8,
+        "scored": 8,
+        "attempts": 1,
+        "error": ""
+      },
+      "without": {
+        "solved": true,
+        "passed": 8,
+        "scored": 8,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 8,
+        "scored": 8,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 8,
+        "scored": 8,
+        "attempts": 1,
+        "error": ""
+      }
+    },
+    {
+      "task": "u04_login_form",
+      "svg": {
+        "solved": true,
+        "passed": 8,
+        "scored": 8,
+        "attempts": 1,
+        "error": ""
+      },
+      "without": {
+        "solved": true,
+        "passed": 8,
+        "scored": 8,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 8,
+        "scored": 8,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 8,
+        "scored": 8,
+        "attempts": 1,
+        "error": ""
+      }
+    },
+    {
+      "task": "u05_bedroom_plan",
+      "svg": {
+        "solved": true,
+        "passed": 10,
+        "scored": 10,
+        "attempts": 1,
+        "error": ""
+      },
+      "without": {
+        "solved": true,
+        "passed": 10,
+        "scored": 10,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 10,
+        "scored": 10,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 10,
+        "scored": 10,
+        "attempts": 3,
+        "error": ""
+      }
+    },
+    {
+      "task": "u06_plaza_cross",
+      "svg": {
+        "solved": true,
+        "passed": 12,
+        "scored": 12,
+        "attempts": 1,
+        "error": ""
+      },
+      "without": {
+        "solved": true,
+        "passed": 12,
+        "scored": 12,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 12,
+        "scored": 12,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 12,
+        "scored": 12,
+        "attempts": 1,
+        "error": ""
+      }
+    },
+    {
+      "task": "u07_nested_cards",
+      "svg": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 1,
+        "error": ""
+      },
+      "without": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 2,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 6,
+        "scored": 6,
+        "attempts": 1,
+        "error": ""
+      }
+    },
+    {
+      "task": "u08_seating_chart",
+      "svg": {
+        "solved": true,
+        "passed": 9,
+        "scored": 9,
+        "attempts": 1,
+        "error": ""
+      },
+      "without": {
+        "solved": true,
+        "passed": 9,
+        "scored": 9,
+        "attempts": 1,
+        "error": ""
+      },
+      "blind": {
+        "solved": true,
+        "passed": 9,
+        "scored": 9,
+        "attempts": 1,
+        "error": ""
+      },
+      "with": {
+        "solved": true,
+        "passed": 9,
+        "scored": 9,
+        "attempts": 1,
+        "error": ""
+      }
+    }
+  ]
+}
