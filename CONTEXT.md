@@ -46,12 +46,12 @@ Paper twin: `academy/papers/spacemantics/`. Coordinating goal: `brain/goals/spac
 | [`bench/`](bench/CONTEXT.md) | The WITH/WITHOUT pilot: does the checker-in-the-loop lift a model's spatial plac |
 | [`checker/`](checker/CONTEXT.md) | Deterministic verifier: it owns geometric truth so a model's eyes never assert g |
 | [`dsl/`](dsl/CONTEXT.md) | The texpace language: concept inventory, conventions reconciliation, spec, gramm |
+| [`refs/`](refs/CONTEXT.md) | Captured references for spacemantics (texpace) — tier-1 links in [REFS.md](REFS. |
 | [`tasks/`](tasks/CONTEXT.md) | Benchmark scenario taxonomy: 13 open-format families × 3 difficulty levels, mach |
 | [`tests/`](tests/CONTEXT.md) | — |
 
 | File | Interface | API | Description |
 |------|-----------|-----|-------------|
-| [`HISTORY.md`](HISTORY.md) | — | — | History |
 | [`README.md`](README.md) | — | — | Spacemantics |
 | [`ROADMAP.md`](ROADMAP.md) | — | — | Spacemantics — Roadmap |
 <!-- routing:end -->

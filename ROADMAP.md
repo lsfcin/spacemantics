@@ -1,8 +1,8 @@
 # Spacemantics — Roadmap
-> Pending work only. Completed milestones are in [HISTORY.md](HISTORY.md).
+> Pending work only. Done work is deleted; git is the history.
 
 ## Status
-**M0 · M0.5 · most of M1 complete** (see HISTORY.md). The thin kernel + checker are built and public
+**M0 · M0.5 · most of M1 complete.** The thin kernel + checker are built and public
 (github.com/lsfcin/spacemantics, 43 tests green); surface v2 regenerated; paper on Overleaf (ICLR, 10pp).
 A **visual WITH/WITHOUT pilot** (`bench/` + `adapters/`) is built and demonstrated, but the real
 comparison is blocked on an on-slate model. Next: **M2** — the actual C0→C3 numbers, which need a model.
@@ -13,7 +13,7 @@ comparison is blocked on an on-slate model. Next: **M2** — the actual C0→C3 
 
 ---
 
-## Milestone 1 — remaining (mostly complete; see HISTORY.md for what shipped)
+## Milestone 1 — remaining
 
 ### W3b — prose parser (deferred)
 The checker consumes the JSON AST directly and is fully exercised through it (43 tests + CLI). A
@@ -51,10 +51,10 @@ rule (rotation = cell remap, never mirror); six coord systems (`src/transform/co
 ### Problem
 Produce the evidence: does texpace + checker lift LLM spatial capability, across dimensions and models?
 
-### Unblock first — model slate + SVG scoring done (see HISTORY.md); one lane still owed
+### Unblock first — model slate + SVG scoring done; one lane still owed
 The `bench/` harness (SVG / WITHOUT / blind / WITH arms, checker-scored), the real model slate
-(`claude-cli` + `opencode` transports), and the SVG round-trip all exist and ran for real — see
-HISTORY.md 2026-07-20 for the full account. Remaining:
+(`claude-cli` + `opencode` transports), and the SVG round-trip all exist and ran for real.
+Remaining:
 - [ ] **Re-run the opencode lane** (GLM 5.2, DeepSeek v4 flash) on `tasks_2d.json` with the hardened
       transport (`bench/cli_transport.py`, `plan` agent + retry, commit 458e8a9). It died silently
       mid-run in the background-task environment last session — cause not diagnosed (no error, no
