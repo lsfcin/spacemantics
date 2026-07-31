@@ -15,8 +15,8 @@ Milestone 2 (task generators + cross-model sweep, out of scope here — this is 
 <!-- routing:start -->
 ## Routing
 
-| File | Interface | API | Description |
-|------|-----------|-----|-------------|
-| [`TAXONOMY-FAMILIES.md`](TAXONOMY-FAMILIES.md) | — | — | texpace — Benchmark Families Detail |
-| [`TAXONOMY.md`](TAXONOMY.md) | — | — | texpace — Benchmark Scenario Taxonomy |
+| File | Description |
+|------|-------------|
+| [`TAXONOMY-FAMILIES.md`](TAXONOMY-FAMILIES.md) | texpace — Benchmark Families Detail |
+| [`TAXONOMY.md`](TAXONOMY.md) | texpace — Benchmark Scenario Taxonomy |
 <!-- routing:end -->

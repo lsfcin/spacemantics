@@ -42,10 +42,10 @@ the checker (see [bench/CONTEXT.md](../bench/CONTEXT.md)).
 <!-- routing:start -->
 ## Routing
 
-| File | Interface | API | Description |
-|------|-----------|-----|-------------|
-| [`__init__.py`](__init__.py) | — | — | **facade** — adapters facade: render a texpace scene to a viewable open format, and parse one back for scoring. |
-| [`__main__.py`](__main__.py) | — | `main` | CLI: `python -m adapters <scene.json>` -> an SVG (footprints + checker verdicts) on stdout. |
-| [`svg.py`](svg.py) | — | `render_document`, `render_pair` | texpace scene -> SVG. Top-down footprints (x,y) with the checker's verdicts drawn on: red = a claim this object breaks. |
-| [`svg_parse.py`](svg_parse.py) | — | `parse_poses`, `invert` | SVG -> poses: read per-object placements back out of an SVG so the checker can score raw-SVG output. |
+| File | API | Description |
+|------|-----|-------------|
+| [`__init__.py`](__init__.py) | — | **facade** — adapters facade: render a texpace scene to a viewable open format, and parse one back for scoring. |
+| [`__main__.py`](__main__.py) | `main` | CLI: `python -m adapters <scene.json>` -> an SVG (footprints + checker verdicts) on stdout. |
+| [`svg.py`](svg.py) | `render_document`, `render_pair` | texpace scene -> SVG. Top-down footprints (x,y) with the checker's verdicts drawn on: red = a claim this object breaks. |
+| [`svg_parse.py`](svg_parse.py) | `parse_poses`, `invert` | SVG -> poses: read per-object placements back out of an SVG so the checker can score raw-SVG output. |
 <!-- routing:end -->

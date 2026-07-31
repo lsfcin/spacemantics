@@ -50,8 +50,8 @@ Paper twin: `academy/papers/spacemantics/`. Coordinating goal: `brain/goals/spac
 | [`tasks/`](tasks/CONTEXT.md) | Benchmark scenario taxonomy: 13 open-format families × 3 difficulty levels, mach |
 | [`tests/`](tests/CONTEXT.md) | — |
 
-| File | Interface | API | Description |
-|------|-----------|-----|-------------|
-| [`README.md`](README.md) | — | — | Spacemantics |
-| [`ROADMAP.md`](ROADMAP.md) | — | — | Spacemantics — Roadmap |
+| File | Description |
+|------|-------------|
+| [`README.md`](README.md) | Spacemantics |
+| [`ROADMAP.md`](ROADMAP.md) | Spacemantics — Roadmap |
 <!-- routing:end -->
