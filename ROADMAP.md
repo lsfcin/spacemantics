@@ -10,6 +10,19 @@ comparison is blocked on an on-slate model. Next: **M2** — the actual C0→C3 
 ## Backlog
 - `cv-go-nogo`: which CV primitives survive (detection/segmentation 2D, depth 2.5D/3D, tracking 4D).
 - `core-tools-wrapper`: add `core/tools/spatial-check` only if the checker is reused cross-project.
+- `texpace-as-tool-layer`: **hypothesis from Lucas (INBOX 2026-08-14), flagged by him as needing a
+  check before it is believed** — *"texpace deve ser acoplado às ferramentas (tools), uma camada
+  entre agentes e tools, agentes não poderiam usar CLI diretamente, tudo seria via texpace"*, i.e.
+  one interface that translates word-semantics into spatial/geometric actions **and blocks commands
+  that are possible but wrong**. The blocking half is the interesting half and it is genuinely this
+  project's thesis — the checker owning geometric truth is exactly "possible but wrong, refused".
+  **The tension to resolve first:** [CONTEXT.md](CONTEXT.md) declares scope as validating *content*
+  in open formats, explicitly **not tool automation**. So this either (a) widens M3's transfer scope
+  deliberately, or (b) is really the narrower `core-tools-wrapper` above wearing an ambitious
+  framing. Decide which before designing anything; they differ by an order of magnitude in cost.
+  Note also that a mandatory layer over *every* CLI would be a hard gate on tools that have nothing
+  spatial about them (`gmail`, `papers`, `web/search`), which is an argument for scoping it to the
+  tools that emit or consume geometry.
 
 ---
 
