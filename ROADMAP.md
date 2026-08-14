@@ -40,6 +40,10 @@ checker dependency. The grammar it must implement is written and example-traced.
       SVG→scene **parser** and a glTF adapter do not yet.
 - [ ] **dogfood parse** — one isoroll scene + one casinhas module as a 7× parametric array. Blocked on the
       spatial-array concept, currently demoted (see `dsl/CHECKABILITY.md`).
+- [ ] **`refs/` is untracked in this repo** — `refs/CONTEXT.md` and `refs/REFS.md` exist on disk and
+      have never been committed, so every captured reference here is one `rm -rf` from gone and
+      invisible to anyone who clones. Noticed 2026-08-14 from the workspace side; decide whether they
+      are tracked content or scratch, then either commit them or gitignore them deliberately.
 
 ### The three design decisions (do not re-litigate)
 1. **Verbs are sugar over `create` + `constrain`.** Actions = the ordered program; claims = the unordered
