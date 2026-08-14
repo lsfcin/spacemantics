@@ -14,7 +14,7 @@ see INVENTORY-EXT.md for `advisory`/`out`.
 
 | Concept | Source | Dimensions | Formats | Deterministically checkable? (how) | Verdict |
 |---|---|---|---|---|---|
-| `DIR(fig,gnd,axis,frame)` | b,C1 | 2D/2.5D/3D/4D | all6 | Rectangle Algebra, one Allen relation per axis (base: left/right/above/below/contains/inside/non-overlap), evaluated in canonical +Z-up frame. Grounded: isoroll `ManifestFacing` = `"N"｜"NE"｜"E"｜"SE"｜"S"｜"SW"｜"W"｜"NW"｜"TOP"` (`code/isoroll-module/src/import/manifest-types.ts:4`); slides derives angle from shear/scale (`core/tools/slides_style.py:51-53`) | core |
+| `DIR(fig,gnd,axis,frame)` | b,C1 | 2D/2.5D/3D/4D | all6 | Rectangle Algebra, one Allen relation per axis (base: left/right/above/below/contains/inside/non-overlap), evaluated in canonical +Z-up frame. Grounded: isoroll `ManifestFacing` = `"N"｜"NE"｜"E"｜"SE"｜"S"｜"SW"｜"W"｜"NW"｜"TOP"` (`code/isoroll-module/src/import/manifest-types.ts:4`); slides derives angle from shear/scale (`core/tools/slides/slides_geom.py`, `rotation_deg`) | core |
 | `DIST(fig,gnd,θ)` | b | 2D/2.5D/3D/4D | all6 | numeric thresholded distance; ordinal quantities are a type error in DIST (C2). Grounded: corpora `DepthEstimator` wraps DepthAnythingV2 → relative/inverse depth = ordinal, cannot feed DIST (`code/corpora/src/depth.py`) | core |
 | `TOP(a,b,rcc)` | b | 2D/2.5D/3D/4D | all6 (native: IFC `IfcRelContainedInSpatialStructure`; derived elsewhere) | RCC-8 {DC,EC,PO,TPP,TPP⁻¹,NTPP,NTPP⁻¹,EQ} region test | core |
 | `PATH(fig,gnd,traj,τ)` | b | 2.5D/3D/4D (static-degenerate in 2D) | glTF, Lottie, PPTX (motion-path anim); not TMX/IFC; SVG excluded (SMIL deprecated, unused per format-slate decision) | trajectory sampled at τ + Allen order over waypoints | core |

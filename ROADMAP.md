@@ -54,7 +54,7 @@ checker dependency. The grammar it must implement is written and example-traced.
 `depthZIndex = (row − col + elev)·10000 + band` (`code/isoroll-module/src/render/iso-tile-depth.ts`);
 tolerances IoU≥0.9, DIM_TOLERANCE=0.02, ALPHA_MIN=8 (`code/isoroll-content/src/cli/sheet_qc.py`); chirality
 rule (rotation = cell remap, never mirror); six coord systems (`src/transform/coord-map.ts`). Slides:
-`rotation_deg=atan2(shearY,scaleX)` (`core/tools/slides_style.py`). corpora: `Box3D`/`Pose6DOF` —
+`rotation_deg=atan2(shearY,scaleX)` (`core/tools/slides/slides_geom.py`; convention documented in `core/tools/slides/SPECS.md` § Geometry). corpora: `Box3D`/`Pose6DOF` —
 **ordinal-only**, never metric. casinhas: `build_ifc.py` + `mapeamento_ifc.csv` selector schema.
 
 ---
