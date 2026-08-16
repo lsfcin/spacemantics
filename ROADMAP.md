@@ -121,3 +121,42 @@ Adapters from the open formats into real applications:
 - **Remotion** — Lottie → video (Remotion enters only here).
 - Slides/animation skill for teaching material (PPTX + Lottie).
 Post-paper. Each adapter declares its conformance level + conventions.
+
+---
+
+## Workspace drift, refiled from the wos ledger 2026-08-16
+
+These were tracked in `/ROADMAP.md`, which was the wrong home: the files live here and no
+workspace-level commit can touch them. The wos ledger's own rule is that a pointer to another
+ROADMAP is a duplicate by definition. Counts regenerate in `/entropy.md`; never copy them here.
+
+- 🔴 **eleven spec-shaped `.md` names are off the workspace type allowlist**, and this is a design
+  question about spacemantics rather than a naming sweep — which is exactly why the wos ledger
+  could not answer it. The names: `TAXONOMY` · `TAXONOMY-FAMILIES` · `TYPES` · `LEXICON` ·
+  `GRAMMAR-JSON` · `CONFORMANCE` · `CHECKABILITY` · `EXAMPLES` · `CONFLICTS` · `INVENTORY` ·
+  `INVENTORY-ADVISORY`, plus a `SPEC.md` that the workspace collapses into `SPECS.md`.
+
+  **A DSL project legitimately has many spec-shaped documents**, so the answer is not "rename them
+  all". `core/SCHEMA.md` § The four disposal routes gives four destinations, and the real work is
+  deciding per file which applies: a hand-authored **constraint** joins one `SPECS.md`;
+  hand-authored **content** becomes a lowercase instance (`taxonomy.md`, `lexicon.md`) and needs no
+  type at all; anything **generated** is lowercase by rule. The uppercase allowlist is closed, so a
+  twelfth name is not an option — the question is which of these are one contract and which are
+  content wearing a contract's name.
+
+  `type-gate.py` is a ratchet and only blocks files a commit *adds*, so nothing here is blocked
+  today. It will block the next new one.
+- 🟡 **`checker/` is over the fanout warn** (15 code files; `WARN_FILES=7`, `BLOCK_FILES=10` in
+  `core/hooks/limits.env`). Worth reading as a signal about responsibilities rather than a count:
+  the checker owns RCC-8 topology, Rectangle-Algebra direction, Allen temporal, and numeric
+  distance/orientation — four calculi in one directory. **A split only pays once each new directory
+  declares itself with a `CONTEXT.md`**: the routing generator folds anything under the warn back
+  into its parent, so moving files without writing that file leaves the parent table as long as it
+  was.
+
+Two hazards worth expecting, both learned the expensive way in `aiwbot` and `flows`: a new
+subdirectory turns a flat import into a module boundary, so the facade gate starts firing on imports
+that were legal the day before — re-export from the new `__init__.py` rather than importing past it.
+And `spec-read-gate.py` stops at the *nearest* ancestor declaring `> spec:`, so a new subdirectory
+written with `spec: none` silently unlocks a spec-locked module; every subdirectory of a locked
+module must re-declare its spec.
