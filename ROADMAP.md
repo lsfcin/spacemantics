@@ -128,7 +128,7 @@ Post-paper. Each adapter declares its conformance level + conventions.
 
 These were tracked in `/ROADMAP.md`, which was the wrong home: the files live here and no
 workspace-level commit can touch them. The wos ledger's own rule is that a pointer to another
-ROADMAP is a duplicate by definition. Counts regenerate in `/entropy.md`; never copy them here.
+ROADMAP is a duplicate by definition. Counts regenerate in `/ISSUES.md` § Entropy; never copy them here.
 
 - 🔴 **eleven spec-shaped `.md` names are off the workspace type allowlist**, and this is a design
   question about spacemantics rather than a naming sweep — which is exactly why the wos ledger
