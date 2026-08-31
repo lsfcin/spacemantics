@@ -9,6 +9,13 @@ comparison is blocked on an on-slate model. Next: **M2** — the actual C0→C3 
 
 ## Backlog
 - `cv-go-nogo`: which CV primitives survive (detection/segmentation 2D, depth 2.5D/3D, tracking 4D).
+- `semantic-layer-compare`: place texpace against the BI/analytics **semantic layer** — one page saying what the two
+  share (a named vocabulary a model must speak) and where they part (ours is checked geometry, theirs is agreed
+  metrics), and whether their consistency result is evidence for our lift claim. Lucas's question, INBOX 2026-08-21;
+  ref in [refs/REFS.md](refs/REFS.md).
+- `eli5-visual-probe`: install the `/eli5` skill and run it on one texpace concept a reader has actually stumbled on.
+  Honest test: does the diagram carry the geometry, or is it decoration on a summary? If it carries it, the question
+  becomes whether texpace should emit that artifact itself. Ref in [refs/REFS.md](refs/REFS.md) (INBOX 2026-08-24).
 - `core-tools-wrapper`: add `core/tools/spatial-check` only if the checker is reused cross-project.
 - `texpace-as-tool-layer`: **hypothesis from Lucas (INBOX 2026-08-14), flagged by him as needing a
   check before it is believed** — *"texpace deve ser acoplado às ferramentas (tools), uma camada

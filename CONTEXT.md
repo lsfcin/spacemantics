@@ -42,16 +42,17 @@ Paper twin: `academy/papers/spacemantics/`. Coordinating goal: `brain/goals/spac
 
 | Subdirectory | Description |
 |--------------|-------------|
-| [`adapters/`](adapters/CONTEXT.md) | Render a texpace scene to a viewable open format. SVG first — 2D, needs no engin |
-| [`bench/`](bench/CONTEXT.md) | The WITH/WITHOUT pilot: does the checker-in-the-loop lift a model's spatial plac |
-| [`checker/`](checker/CONTEXT.md) | Deterministic verifier: it owns geometric truth so a model's eyes never assert g |
-| [`dsl/`](dsl/CONTEXT.md) | The texpace language: concept inventory, conventions reconciliation, spec, gramm |
-| [`refs/`](refs/CONTEXT.md) | Captured references for spacemantics (texpace) — tier-1 links in [REFS.md](REFS. |
-| [`tasks/`](tasks/CONTEXT.md) | Benchmark scenario taxonomy: 13 open-format families × 3 difficulty levels, mach |
+| [`adapters/`](adapters/CONTEXT.md) | Render a texpace scene to a viewable open format. SVG first — 2D, needs no engine, opens in any browser. |
+| [`bench/`](bench/CONTEXT.md) | The WITH/WITHOUT pilot: does the checker-in-the-loop lift a model's spatial placement? Same tasks, same scorer, three arms. |
+| [`checker/`](checker/CONTEXT.md) | Deterministic verifier: it owns geometric truth so a model's eyes never assert geometry. Scores claims on definite scenes, O(n²). |
+| [`dsl/`](dsl/CONTEXT.md) | The texpace language: concept inventory, conventions reconciliation, spec, grammar, adapter conformance |
+| [`refs/`](refs/CONTEXT.md) | Captured references for spacemantics (texpace) — tier-1 links in [REFS.md](refs/REFS.md); promote to `<slug>.yaml` for deep study (schema: `academy/papers/*/refs/CONTEXT.md`). |
+| [`tasks/`](tasks/CONTEXT.md) | Benchmark scenario taxonomy: 13 open-format families × 3 difficulty levels, machine-checkable ground truth |
 | [`tests/`](tests/CONTEXT.md) | — |
 
 | File | Description |
 |------|-------------|
-| [`README.md`](README.md) | Spacemantics |
-| [`ROADMAP.md`](ROADMAP.md) | Spacemantics — Roadmap |
+| [`ISSUES.md`](ISSUES.md) | What is currently untrue that we know about in this repo: hand-written issues first, every measured number inside its own generated block. |
+| [`README.md`](README.md) | Give LLM agents spatial/visual capability through a verifiable spatial DSL — not pixels, not vibes. |
+| [`ROADMAP.md`](ROADMAP.md) | Pending work only. Done work is deleted; git is the history. |
 <!-- routing:end -->
