@@ -55,4 +55,5 @@ Paper twin: `academy/papers/spacemantics/`. Coordinating goal: `brain/goals/spac
 | [`ISSUES.md`](ISSUES.md) | What is currently untrue that we know about in this repo: hand-written issues first, every measured number inside its own generated block. |
 | [`README.md`](README.md) | Give LLM agents spatial/visual capability through a verifiable spatial DSL — not pixels, not vibes. |
 | [`ROADMAP.md`](ROADMAP.md) | Pending work only. Done work is deleted; git is the history. |
+| [`examples/office.json`](examples/office.json) | ← add first-line comment |
 <!-- routing:end -->

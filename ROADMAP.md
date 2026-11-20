@@ -8,6 +8,18 @@ A **visual WITH/WITHOUT pilot** (`bench/` + `adapters/`) is built and demonstrat
 comparison is blocked on an on-slate model. Next: **M2** — the actual C0→C3 numbers, which need a model.
 
 ## Backlog
+
+- [ ] [taiga-s1] Study Taiga-S1/Biome-S1 structured goals, state/action interface and final-solid checks against texpace; distinguish execution from geometric verification and audit the reel's reported false PASS against a pinned version. Ref: refs/REFS.md [Taiga-S1].
+
+- [ ] [visual-comparisons] Assess complete-image numeric extraction: retain printed values, label estimated bar fractions with uncertainty, and keep perception separate from geometric truth. Ref: refs/REFS.md [visual-comparisons].
+
+- [ ] [anatomy] Assess Anatomy on one bounded isometric/temporal example, separating editable browser geometry from verified scene semantics, offline sprites and Foundry playback. Ref: refs/REFS.md [anatomy].
+
+- [ ] [web-motion] Compare the demonstrated animation/UI tools on one needed browser visual, checking actual identity, editability, accessibility, licence and export before adoption. Ref: refs/REFS.md [web-motion].
+
+- [ ] [bygga-spatial-decomp] Analisar a decomposição geométrica de manuais do Bygga (Nutlope/bygga) como caso prático de verificação espacial e grounded step-by-step DSL em texpace/spacemantics. Ref: refs/REFS.md [bygga-spatial-decomp].
+
+
 - `cv-go-nogo`: which CV primitives survive (detection/segmentation 2D, depth 2.5D/3D, tracking 4D).
 - `semantic-layer-compare`: place texpace against the BI/analytics **semantic layer** — one page saying what the two
   share (a named vocabulary a model must speak) and where they part (ours is checked geometry, theirs is agreed
