@@ -9,6 +9,8 @@ comparison is blocked on an on-slate model. Next: **M2** — the actual C0→C3 
 
 ## Backlog
 
+- [ ] [scenario-texpace] Use Scenario 3D OS as Lucas's texpace stress-test candidate: derive bounded scene/animation tasks from the demos, state numeric spatial/temporal claims, and compare outputs with/without checker feedback. Keep tool execution separate from geometric proof; inspect exportability, licences and account/app requirements before selecting a trial. Ref: [refs/REFS.md](refs/REFS.md) [scenario-texpace].
+
 - [ ] [taiga-s1] Study Taiga-S1/Biome-S1 structured goals, state/action interface and final-solid checks against texpace; distinguish execution from geometric verification and audit the reel's reported false PASS against a pinned version. Ref: refs/REFS.md [Taiga-S1].
 
 - [ ] [visual-comparisons] Assess complete-image numeric extraction: retain printed values, label estimated bar fractions with uncertainty, and keep perception separate from geometric truth. Ref: refs/REFS.md [visual-comparisons].
@@ -59,10 +61,6 @@ checker dependency. The grammar it must implement is written and example-traced.
       SVG→scene **parser** and a glTF adapter do not yet.
 - [ ] **dogfood parse** — one isoroll scene + one casinhas module as a 7× parametric array. Blocked on the
       spatial-array concept, currently demoted (see `dsl/CHECKABILITY.md`).
-- [ ] **`refs/` is untracked in this repo** — `refs/CONTEXT.md` and `refs/REFS.md` exist on disk and
-      have never been committed, so every captured reference here is one `rm -rf` from gone and
-      invisible to anyone who clones. Noticed 2026-08-14 from the workspace side; decide whether they
-      are tracked content or scratch, then either commit them or gitignore them deliberately.
 
 ### The three design decisions (do not re-litigate)
 1. **Verbs are sugar over `create` + `constrain`.** Actions = the ordered program; claims = the unordered

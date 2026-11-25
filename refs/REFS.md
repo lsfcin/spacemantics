@@ -21,3 +21,6 @@
 - [C] [Rating bars](https://www.instagram.com/p/DeZjFVZALGO/) — [src: web:instagram.com] No printed percentages; drawn spans are estimates, not calibrated scores; assessment: ../ROADMAP.md [visual-comparisons].
 - [Bygga](https://github.com/Nutlope/bygga) — [src: web:instagram.com post DfQfOlqjPXD via theaifield] app open-source que converte manuais em guias 3D interativos com decomposição de passos e peças; caso de estudo para grounded spatial representation e DSLs de montagem — assessment em ../ROADMAP.md [bygga-spatial-decomp].
 - [Taiga-S1 / Biome-S1](https://lucassf.pages.dev/spatial/taiga) — [src: github:shhivv/biome-s1; Instagram/simplyaishow] Structured FreeCAD goals and tiny state/action executors; author-reported metrics, no local reproduction. [Capture](https://lucassf.pages.dev/spatial/taiga-reel); assessment: ../ROADMAP.md [taiga-s1].
+
+## Spatial and temporal stress tests
+- [scenario-texpace — Scenario 3D OS](https://github.com/scenario-labs/skills) — [src: github:scenario-labs/skills; instagram.com/botsgone.wild] The [demo](https://www.instagram.com/reel/DfsjQP3SWbi/) shows prompt-driven character, scene and asset workflows; execution is not geometric verification. Lucas proposes a texpace stress test; task: [ROADMAP](../ROADMAP.md) [scenario-texpace].
